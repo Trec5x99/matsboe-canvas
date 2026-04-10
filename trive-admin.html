@@ -847,6 +847,21 @@ function renderTrendChart() {
     });
 }
 
+function setMode(m){
+  mode = m;
+  document.getElementById('bpin').classList.toggle('active', m === 'pin');
+  document.getElementById('bdraw').classList.toggle('active', m === 'draw');
+  if (m === 'draw') {
+    if (!window.drawControl) {
+      window.drawControl = new L.Control.Draw({
+        draw: { polygon: { allowIntersection: false, showArea: true }, circle: false, marker: false, polyline: false, rectangle: false },
+        edit: { featureGroup: drawnItems }
+      });
+      map.addControl(window.drawControl);
+    }
+  }
+}
+
 function renderAgentMap() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
@@ -1340,7 +1355,7 @@ function renderSettingsPage() {
             <label class="flbl">Standard dagsmål demands</label>
             <input type="number" id="setting-default_demand_goal" class="fi" value="${settings.default_demand_goal || ''}">
             <label class="flbl">Standard dagsmål jobber</label>
-            <input type="number" id="setting-default_job_goal" class="fi" value="${settings.default_job_goal || ''}">
+            <input type="number" id="setting-default-job-goal" class="fi" value="${settings.default_job_goal || ''}">
             <button class="btn btn-p" onclick="saveSettings('general')">Lagre generelt</button>
         </div>
 
