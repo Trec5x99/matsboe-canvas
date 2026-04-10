@@ -19,47 +19,89 @@
   --bo:#475569;--tx:#f1f5f9;--mu:#94a3b8;--ra:8px
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-#tb{background:var(--su);border-bottom:1px solid var(--bo);padding:9px 14px;display:flex;align-items:center;gap:9px;flex-shrink:0;flex-wrap:wrap}
-h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.5px}
+
+/* Topbar */
+#tb{background:var(--su);border-bottom:1px solid var(--bo);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+h1{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.5px}
 h1 em{color:var(--ind);font-style:normal}
-.usel{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:5px 9px;border-radius:var(--ra);font-size:12px;cursor:pointer;min-width:130px}
-.mb{background:var(--su2);border:1px solid var(--bo);color:var(--mu);padding:5px 11px;border-radius:var(--ra);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.usel{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:5px 9px;border-radius:var(--ra);font-size:12px;cursor:pointer;min-width:120px}
+.mb{background:var(--su2);border:1px solid var(--bo);color:var(--mu);padding:5px 10px;border-radius:var(--ra);font-size:11px;cursor:pointer;transition:all .12s;white-space:nowrap}
 .mb.on{background:var(--ind);border-color:var(--ind);color:#fff}
 .mb.dn{background:#7c3aed;border-color:#7c3aed;color:#fff}
-#ht{font-size:11px;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:var(--ra);padding:3px 9px}
-.tb-r{margin-left:auto;display:flex;gap:7px;align-items:center}
-#sync-dot{width:8px;height:8px;border-radius:50%;background:#64748b;flex-shrink:0;transition:background .3s}
+.mb.warn{background:rgba(220,38,38,.15);border-color:#dc2626;color:#fca5a5}
+#ht{font-size:11px;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:var(--ra);padding:3px 9px;display:none}
+.tb-r{margin-left:auto;display:flex;gap:6px;align-items:center}
+#sync-dot{width:8px;height:8px;border-radius:50%;background:#64748b;flex-shrink:0}
 #sync-dot.ok{background:#16a34a}
 #sync-dot.err{background:#dc2626}
-#sync-dot.loading{background:#d97706;animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#sync-dot.syn{background:#d97706;animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Layout */
 #mn{display:flex;flex:1;overflow:hidden}
 #mp{flex:1;z-index:1;position:relative}
-#rp{width:300px;background:var(--su);border-left:1px solid var(--bo);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .2s}
+#rp{width:310px;background:var(--su);border-left:1px solid var(--bo);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .2s}
 #rp.hidden{width:0;overflow:hidden;border-left:none}
-#rp-inner{width:300px;display:flex;flex-direction:column;height:100%;overflow:hidden}
-#rp-tabs{display:flex;border-bottom:1px solid var(--bo);flex-shrink:0}
-.rpt{flex:1;padding:9px 4px;text-align:center;font-size:11px;cursor:pointer;color:var(--mu);border:none;background:none;white-space:nowrap}
+#rp-inner{width:310px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+#rp-tabs{display:flex;border-bottom:1px solid var(--bo);flex-shrink:0;overflow-x:auto}
+.rpt{flex-shrink:0;padding:8px 10px;font-size:11px;cursor:pointer;color:var(--mu);border:none;background:none;white-space:nowrap}
 .rpt.on{color:var(--ind);border-bottom:2px solid var(--ind)}
 #rp-body{flex:1;overflow-y:auto;padding:12px}
-.pt-row{display:flex;background:var(--su2);border-radius:var(--ra);padding:3px;gap:2px;margin-bottom:14px}
-.pt{flex:1;padding:5px 3px;border-radius:6px;text-align:center;font-size:10px;cursor:pointer;color:var(--mu);border:none;background:none}
+
+/* Period tabs */
+.pt-row{display:flex;background:var(--su2);border-radius:var(--ra);padding:3px;gap:2px;margin-bottom:12px}
+.pt{flex:1;padding:4px 2px;border-radius:6px;text-align:center;font-size:10px;cursor:pointer;color:var(--mu);border:none;background:none}
 .pt.on{background:var(--ind);color:#fff;font-weight:500}
-.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.sc{background:var(--su2);border-radius:var(--ra);padding:10px;border-left:3px solid transparent}
-.sc-val{font-size:22px;font-weight:700;margin-bottom:2px}
+
+/* Stat cards */
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.sc{background:var(--su2);border-radius:var(--ra);padding:9px;border-left:3px solid transparent}
+.sc-val{font-size:20px;font-weight:700;margin-bottom:1px}
 .sc-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px}
 .sc-sub{font-size:10px;color:var(--mu);margin-top:2px}
-.srep{background:var(--su2);border-radius:var(--ra);padding:9px;margin-bottom:7px;cursor:pointer;border:1px solid transparent}
-.srep:hover{border-color:var(--bo)}
-.srep-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-.srep-bar-wrap{display:flex;gap:2px;height:4px;border-radius:2px;overflow:hidden;margin-top:5px}
-.srep-bar{height:100%}
-.srep-mini{display:flex;gap:8px;font-size:10px;color:var(--mu)}
+
+/* Trend bar */
+.trend-wrap{margin-bottom:12px}
+.trend-bars{display:flex;align-items:flex-end;gap:2px;height:40px;margin-top:4px}
+.trend-bar{flex:1;border-radius:2px 2px 0 0;min-height:2px;transition:height .3s;cursor:pointer;position:relative}
+.trend-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid var(--bo);color:var(--tx);font-size:10px;padding:3px 6px;border-radius:4px;white-space:nowrap;z-index:10}
+
+/* Rep rows */
+.srep{background:var(--su2);border-radius:var(--ra);padding:9px;margin-bottom:6px;cursor:pointer;border:1px solid transparent;transition:border .1s}
+.srep:hover,.srep.active{border-color:var(--ind)}
+.srep-hdr{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.srep-bar-wrap{display:flex;gap:2px;height:4px;border-radius:2px;overflow:hidden;margin-top:4px}
+.srep-mini{display:flex;gap:7px;font-size:10px;color:var(--mu)}
+.goal-bar{height:3px;background:var(--su);border-radius:2px;margin-top:3px;overflow:hidden}
+.goal-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* Live dot */
+.live-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;animation:pulse .8s infinite;margin-right:3px}
+.offline-dot{width:7px;height:7px;border-radius:50%;background:#64748b;display:inline-block;margin-right:3px}
+
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--su2);border-radius:var(--ra);margin-bottom:5px}
+.lb-rank{font-size:14px;font-weight:700;min-width:24px;text-align:center}
+.lb-name{font-size:12px;font-weight:600;flex:1}
+.lb-val{font-size:12px;font-weight:700}
+.lb-sub{font-size:10px;color:var(--mu)}
+
+/* Activity log */
+.al-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px}
+.al-time{color:var(--mu);min-width:45px;font-size:10px}
+.al-rep{font-weight:500;min-width:50px}
+
+/* Zone cards */
 .zc{border-radius:var(--ra);padding:9px;margin-bottom:7px;border:1px solid rgba(255,255,255,.07);cursor:pointer}
 .zc:hover{border-color:rgba(255,255,255,.18)}
 .zc-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
 .zc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.zone-status{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500}
+.zs-done{background:var(--gl);color:var(--gd)}
+.zs-active{background:var(--al);color:var(--ad)}
+.zs-none{background:var(--su2);color:var(--mu)}
+
+/* House items */
 .hi{background:var(--su2);border-radius:var(--ra);padding:8px;margin-bottom:6px;cursor:pointer;border:1px solid transparent}
 .hi:hover{border-color:var(--bo)}
 .ha{font-size:12px;font-weight:500;margin-bottom:2px}
@@ -70,21 +112,29 @@ h1 em{color:var(--ind);font-style:normal}
 .b1{background:var(--bl);color:var(--bd)}
 .b2{background:var(--rl);color:var(--rd)}
 .b3{background:var(--gl);color:var(--gd)}
-#map-stats{position:absolute;top:12px;left:12px;z-index:500;background:rgba(15,23,42,.9);border:1px solid var(--bo);border-radius:10px;padding:12px 14px;display:none;min-width:250px}
+
+/* Map overlay */
+#map-stats{position:absolute;top:12px;left:12px;z-index:500;background:rgba(15,23,42,.92);border:1px solid var(--bo);border-radius:10px;padding:12px 14px;display:none;min-width:240px;max-height:calc(100vh - 80px);overflow-y:auto}
 #map-stats.vis{display:block}
-#map-stats h4{font-size:12px;font-weight:600;margin-bottom:10px;color:#fff;display:flex;align-items:center;gap:8px}
-.ms-period{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
+#map-stats h4{font-size:12px;font-weight:600;margin-bottom:8px;color:#fff}
+.ms-period{display:flex;gap:3px;margin-bottom:8px;flex-wrap:wrap}
 .msp{padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;background:var(--su2);color:var(--mu);border:none}
 .msp.on{background:var(--ind);color:#fff}
-.ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
 .ms-cell{text-align:center}
-.ms-val{font-size:16px;font-weight:700}
-.ms-lbl{font-size:9px;color:var(--mu);margin-top:1px}
-.ms-rep-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px}
+.ms-val{font-size:15px;font-weight:700}
+.ms-lbl{font-size:9px;color:var(--mu)}
+.ms-rep-row{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:11px}
 .ms-rep-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-#ov,#zov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center}
-#ov.vis,#zov.vis{display:flex}
-.pop{background:var(--su);border:1px solid var(--bo);border-radius:12px;padding:18px;width:320px;max-width:calc(100vw - 24px)}
+
+/* Alert banner */
+#alert-bar{background:rgba(220,38,38,.15);border-bottom:1px solid rgba(220,38,38,.3);padding:6px 14px;display:none;font-size:11px;color:#fca5a5;flex-shrink:0}
+#alert-bar.vis{display:flex;align-items:center;gap:8px}
+
+/* Popups */
+#ov,#zov,#gov,#cov,#hov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center}
+#ov.vis,#zov.vis,#gov.vis,#cov.vis,#hov.vis{display:flex}
+.pop{background:var(--su);border:1px solid var(--bo);border-radius:12px;padding:18px;width:330px;max-width:calc(100vw - 24px);max-height:90vh;overflow-y:auto}
 .pop h3{font-size:14px;font-weight:600;margin-bottom:3px}
 .pop-sub{font-size:11px;color:var(--mu);margin-bottom:14px}
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
@@ -96,8 +146,8 @@ h1 em{color:var(--ind);font-style:normal}
 textarea.nt{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:6px 9px;border-radius:var(--ra);font-size:11px;width:100%;margin-bottom:10px;resize:none;height:50px}
 textarea.nt::placeholder{color:var(--mu)}
 .fi{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:6px 9px;border-radius:var(--ra);font-size:12px;width:100%;margin-bottom:10px}
-.flbl{font-size:11px;color:var(--mu);margin-bottom:4px;display:block}
-.pact{display:flex;gap:7px}
+.flbl{font-size:11px;color:var(--mu);margin-bottom:4px;display:block;margin-top:4px}
+.pact{display:flex;gap:7px;flex-wrap:wrap}
 .btn{padding:7px 12px;border-radius:var(--ra);border:none;cursor:pointer;font-size:12px;font-weight:500}
 .bp{background:var(--ind);color:#fff;flex:1}.bp:hover{background:var(--ind2)}
 .bg{background:var(--su2);color:var(--mu)}.bg:hover{color:var(--tx)}
@@ -108,8 +158,13 @@ textarea.nt::placeholder{color:var(--mu)}
 .empty{text-align:center;color:var(--mu);font-size:12px;padding:16px 8px;line-height:1.6}
 .draw-tip{background:rgba(124,58,237,.13);border:1px solid rgba(124,58,237,.35);border-radius:var(--ra);padding:9px 10px;font-size:11px;color:#c4b5fd;text-align:center;line-height:1.6;margin-bottom:8px}
 .sec-title{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px}
-.divider{border-top:1px solid var(--bo);margin:12px 0}
+.divider{border-top:1px solid var(--bo);margin:10px 0}
 .rnum{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-right:4px}
+.comment-item{background:var(--su2);border-radius:var(--ra);padding:8px;margin-bottom:6px;font-size:11px}
+.comment-meta{font-size:10px;color:var(--mu);margin-bottom:3px}
+.hknock-item{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px}
+.exp-btn{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc;padding:5px 10px;border-radius:var(--ra);font-size:11px;cursor:pointer;width:100%;margin-bottom:8px}
+.exp-btn:hover{background:rgba(99,102,241,.25)}
 </style>
 </head>
 <body>
@@ -121,24 +176,30 @@ textarea.nt::placeholder{color:var(--mu)}
     <option>Lars</option><option>Ida</option><option>Erik</option><option>Nora</option>
     <option>Håkon</option><option>Lena</option>
   </select>
-  <button class="mb on" id="bpin" onclick="setMode('pin')">＋ Marker hus</button>
-  <button class="mb" id="bdraw" onclick="setMode('draw')">⬡ Tegn sone</button>
+  <button class="mb on" id="bpin" onclick="setMode('pin')">＋ Hus</button>
+  <button class="mb" id="bdraw" onclick="setMode('draw')">⬡ Sone</button>
+  <button class="mb" id="bheat" onclick="toggleHeat()">🔥 Varmekart</button>
   <button class="mb" id="bview" onclick="setMode('view')">Vis</button>
-  <span id="ht" style="display:none"></span>
+  <span id="ht"></span>
   <div class="tb-r">
-    <div id="sync-dot" title="Synkroniseringsstatus"></div>
-    <button class="mb" id="bmaponly" onclick="toggleMapOnly()">⛶ Kart-modus</button>
-    <button class="mb" id="btoggle" onclick="togglePanel()">◀ Skjul panel</button>
+    <div id="sync-dot" title="Synkstatus"></div>
+    <button class="mb" id="bexport" onclick="exportCSV()">↓ CSV</button>
+    <button class="mb" id="bmaponly" onclick="toggleMapOnly()">⛶ Kart</button>
+    <button class="mb" id="btoggle" onclick="togglePanel()">◀ Skjul</button>
   </div>
+</div>
+<div id="alert-bar">
+  <span>⚠️</span><span id="alert-txt"></span>
+  <button onclick="document.getElementById('alert-bar').classList.remove('vis')" style="margin-left:auto;background:none;border:none;color:#fca5a5;cursor:pointer">✕</button>
 </div>
 <div id="mn">
   <div id="mp">
     <div id="map-stats">
-      <h4>Statistikk <span id="ms-period-lbl" style="color:var(--mu);font-weight:400;font-size:10px"></span></h4>
+      <h4>Live statistikk</h4>
       <div class="ms-period">
         <button class="msp on" onclick="setMsPer('24h')">24t</button>
-        <button class="msp" onclick="setMsPer('7d')">7 dager</button>
-        <button class="msp" onclick="setMsPer('31d')">31 dager</button>
+        <button class="msp" onclick="setMsPer('7d')">7d</button>
+        <button class="msp" onclick="setMsPer('31d')">31d</button>
         <button class="msp" onclick="setMsPer('month')">Mnd</button>
         <button class="msp" onclick="setMsPer('avg')">Snitt</button>
       </div>
@@ -150,6 +211,8 @@ textarea.nt::placeholder{color:var(--mu)}
     <div id="rp-inner">
       <div id="rp-tabs">
         <button class="rpt on" onclick="swRp('stats')">Statistikk</button>
+        <button class="rpt" onclick="swRp('board')">Topp</button>
+        <button class="rpt" onclick="swRp('log')">Logg</button>
         <button class="rpt" onclick="swRp('soner')">Soner</button>
         <button class="rpt" onclick="swRp('hus')">Hus</button>
       </div>
@@ -177,6 +240,7 @@ textarea.nt::placeholder{color:var(--mu)}
       <option>Håkon</option><option>Lena</option>
     </select>
     <textarea class="nt" id="pnote" placeholder="Notat…"></textarea>
+    <div id="knock-hist" style="margin-bottom:10px"></div>
     <div class="pact">
       <button class="btn bp" onclick="saveH()">Lagre</button>
       <button class="btn bg" onclick="closePop()">Avbryt</button>
@@ -190,14 +254,48 @@ textarea.nt::placeholder{color:var(--mu)}
   <div class="pop">
     <h3 id="ztitle">Sone</h3>
     <div class="pop-sub" id="zmeta"></div>
-    <span class="flbl">Navn på sone</span>
+    <span class="flbl">Navn</span>
     <input class="fi" id="zname" placeholder="f.eks. Grünerløkka nord…">
+    <span class="flbl">Status</span>
+    <select class="fi" id="zstatus">
+      <option value="none">Ikke startet</option>
+      <option value="active">Pågående</option>
+      <option value="done">Ferdig</option>
+    </select>
     <span class="flbl">Tildel selgere</span>
     <div class="rep-check-grid" id="zrep-grid"></div>
     <div class="pact">
       <button class="btn bp" onclick="saveZone()">Lagre</button>
       <button class="btn bg" onclick="closeZPop()">Avbryt</button>
       <button class="btn bd" onclick="deleteZone()">Slett sone</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goals popup -->
+<div id="gov" onclick="if(event.target===this)closeGPop()">
+  <div class="pop">
+    <h3 id="gotitle">Dagsmål</h3>
+    <div class="pop-sub">Sett daglig mål for antall banker</div>
+    <div id="goal-inputs"></div>
+    <div class="pact" style="margin-top:8px">
+      <button class="btn bp" onclick="saveGoals()">Lagre mål</button>
+      <button class="btn bg" onclick="closeGPop()">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<!-- Comment popup -->
+<div id="cov" onclick="if(event.target===this)closeCPop()">
+  <div class="pop">
+    <h3 id="cotitle">Kommentar</h3>
+    <div class="pop-sub" id="cosub"></div>
+    <div id="comment-list" style="margin-bottom:10px"></div>
+    <span class="flbl">Ny kommentar</span>
+    <textarea class="nt" id="cotext" placeholder="Skriv kommentar til selger…" style="height:70px"></textarea>
+    <div class="pact">
+      <button class="btn bp" onclick="saveComment()">Send</button>
+      <button class="btn bg" onclick="closeCPop()">Lukk</button>
     </div>
   </div>
 </div>
@@ -213,46 +311,76 @@ const STA=['Ikke hjemme','Allerede kunde','Ikke interessert','Ble kunde nå'];
 const SCOL=['#d97706','#2563eb','#dc2626','#16a34a'];
 const ZCOLS=['#7c3aed','#0891b2','#16a34a','#ea580c','#db2777','#0d9488','#d97706','#6366f1','#dc2626','#84cc16'];
 
-let houses=[],zones=[],activity=[];
+let houses=[],zones=[],activity=[],goals={},comments=[],locations=[];
 let mode='pin',rpTab='stats',curUser='admin',mapOnly=false,panelOpen=true,msPer='24h';
-let pendLL=null,editId=null,selSt=null,editZoneId=null;
-let mkrs={},zoneLyrs={},routeLines={};
+let showHeat=false;
+let pendLL=null,editId=null,selSt=null,editZoneId=null,commentRep=null;
+let mkrs={},zoneLyrs={},routeLines={},locMkrs={},heatLayer=null;
 let dpPts=[],dpMkrs=[],dpLines=[],prevLine=null;
+let alertTimer=null;
 
+// ---- Map init ----
 const map=L.map('mp').setView([59.9139,10.7522],15);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
   {attribution:'© OSM © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
 
-function setSyncDot(state){const d=document.getElementById('sync-dot');d.className='';d.classList.add(state);}
+function setSyncDot(s){const d=document.getElementById('sync-dot');d.className=s;}
 
-// ---- Load from Supabase ----
+// ---- Load ----
 async function loadAll(){
-  setSyncDot('loading');
+  setSyncDot('syn');
   try{
-    const [hRes,zRes,aRes]=await Promise.all([
+    const [hR,zR,aR,gR,cR,lR]=await Promise.all([
       sb.from('houses').select('*'),
       sb.from('zones').select('*'),
-      sb.from('activity').select('*').order('ts',{ascending:false}).limit(5000)
+      sb.from('activity').select('*').order('ts',{ascending:false}).limit(5000),
+      sb.from('goals').select('*'),
+      sb.from('comments').select('*').order('ts',{ascending:false}),
+      sb.from('locations').select('*')
     ]);
-    if(hRes.error||zRes.error||aRes.error)throw new Error('Load error');
-    houses=hRes.data||[];
-    zones=(zRes.data||[]).map(z=>({...z,pts:z.pts||[],reps:z.reps||[],route:z.route||[]}));
-    activity=aRes.data||[];
+    if(hR.error||zR.error||aR.error)throw new Error();
+    houses=hR.data||[];
+    zones=(zR.data||[]).map(z=>({...z,pts:z.pts||[],reps:z.reps||[],route:z.route||[],status:z.status||'none'}));
+    activity=aR.data||[];
+    goals={};(gR.data||[]).forEach(g=>{goals[g.rep]=g.daily_target;});
+    comments=cR.data||[];
+    locations=lR.data||[];
     setSyncDot('ok');
+    checkAlerts();
     renderMap();renderPanel();renderMapStats();
   }catch(e){setSyncDot('err');console.error(e);}
 }
 
-// ---- Realtime subscriptions ----
 function setupRealtime(){
-  sb.channel('changes')
+  sb.channel('all-changes')
     .on('postgres_changes',{event:'*',schema:'public',table:'houses'},()=>loadAll())
     .on('postgres_changes',{event:'*',schema:'public',table:'zones'},()=>loadAll())
     .on('postgres_changes',{event:'*',schema:'public',table:'activity'},()=>loadAll())
+    .on('postgres_changes',{event:'*',schema:'public',table:'goals'},()=>loadAll())
+    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadAll())
+    .on('postgres_changes',{event:'*',schema:'public',table:'locations'},()=>loadAll())
     .subscribe();
 }
 
-// ---- Time helpers ----
+// ---- Alerts ----
+function checkAlerts(){
+  if(curUser!=='admin')return;
+  const inactive=[];
+  REPS.forEach(rep=>{
+    const repActs=activity.filter(a=>a.rep===rep);
+    if(!repActs.length)return;
+    const last=new Date(repActs[0].ts);
+    const minsAgo=(Date.now()-last.getTime())/60000;
+    if(minsAgo>120&&minsAgo<480){inactive.push({rep,mins:Math.round(minsAgo)});}
+  });
+  if(inactive.length){
+    const txt=inactive.map(i=>`${i.rep} (${i.mins}min siden)`).join(', ');
+    document.getElementById('alert-txt').textContent=`Ingen aktivitet: ${txt}`;
+    document.getElementById('alert-bar').classList.add('vis');
+  }
+}
+
+// ---- Stats helpers ----
 function periodStart(p){
   const d=new Date();
   if(p==='24h')d.setHours(d.getHours()-24);
@@ -262,9 +390,9 @@ function periodStart(p){
   else d.setFullYear(2000);
   return d;
 }
-function actInPeriod(p,rep){
-  const start=periodStart(p);
-  return activity.filter(a=>new Date(a.ts)>=start&&(rep?a.rep===rep:true));
+function actIn(p,rep){
+  const s=periodStart(p);
+  return activity.filter(a=>new Date(a.ts)>=s&&(rep?a.rep===rep:true));
 }
 function calcStats(acts){
   const total=acts.length;
@@ -276,20 +404,51 @@ function avgPerDay(rep){
   const acts=rep?activity.filter(a=>a.rep===rep):activity;
   if(!acts.length)return{total:0,counts:[0,0,0,0],rate:0};
   const days=Math.max(1,[...new Set(acts.map(a=>a.ts.slice(0,10)))].length);
-  const total=Math.round(acts.length/days);
-  const counts=[0,1,2,3].map(i=>Math.round(acts.filter(a=>a.st===i).length/days));
-  const rate=total>0?Math.round(counts[3]/total*100):0;
-  return{total,counts,rate};
+  return{
+    total:Math.round(acts.length/days),
+    counts:[0,1,2,3].map(i=>Math.round(acts.filter(a=>a.st===i).length/days)),
+    rate:Math.round(acts.filter(a=>a.st===3).length/acts.length*100)
+  };
 }
-function getStats(p,rep){return p==='avg'?avgPerDay(rep):calcStats(actInPeriod(p,rep));}
+function getStats(p,rep){return p==='avg'?avgPerDay(rep):calcStats(actIn(p,rep));}
 
-// ---- Map ----
+function isLive(rep){
+  const loc=locations.find(l=>l.rep===rep);
+  if(!loc)return false;
+  return(Date.now()-new Date(loc.ts).getTime())<600000;
+}
+
+function lastSeen(rep){
+  const acts=activity.filter(a=>a.rep===rep);
+  if(!acts.length)return'Aldri';
+  const d=new Date(acts[0].ts);
+  const mins=Math.round((Date.now()-d.getTime())/60000);
+  if(mins<2)return'Nå';
+  if(mins<60)return`${mins}min siden`;
+  if(mins<1440)return`${Math.round(mins/60)}t siden`;
+  return`${Math.round(mins/1440)}d siden`;
+}
+
+// Trend: last 7 days grouped by date
+function getTrend(rep){
+  const out=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+    const d2=new Date(d);d2.setDate(d2.getDate()+1);
+    const acts=activity.filter(a=>{const t=new Date(a.ts);return t>=d&&t<d2&&(rep?a.rep===rep:true);});
+    out.push({label:d.toLocaleDateString('no',{weekday:'short'}),total:acts.length,customers:acts.filter(a=>a.st===3).length});
+  }
+  return out;
+}
+
+// ---- Map rendering ----
 function houseZoneColor(id){const z=zones.find(z=>z.route&&z.route.includes(id));return z?z.color:null;}
 function mkIcon(st,zc){
   const c=st===null?'#64748b':SCOL[st];
   const ring=zc?`box-shadow:0 0 0 3px ${zc},0 2px 8px rgba(0,0,0,.4);`:'box-shadow:0 2px 8px rgba(0,0,0,.4);';
-  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${c};border:2.5px solid #fff;${ring}cursor:pointer"></div>`,iconSize:[26,26],iconAnchor:[13,13]});
+  return L.divIcon({className:'',html:`<div style="width:24px;height:24px;border-radius:50%;background:${c};border:2px solid #fff;${ring}cursor:pointer"></div>`,iconSize:[24,24],iconAnchor:[12,12]});
 }
+
 function renderMap(){
   Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
   const filtered=curUser==='admin'?houses:houses.filter(h=>h.rep===curUser);
@@ -303,12 +462,65 @@ function renderMap(){
     if(!z.pts||!z.pts.length)return;
     const lyr=L.polygon(z.pts.map(p=>[p.lat,p.lng]),{color:z.color,fillColor:z.color,fillOpacity:.1,weight:2}).addTo(map);
     lyr.on('click',e=>{L.DomEvent.stop(e);openZPop(z.id);});
+    // zone status label
+    const center=lyr.getBounds().getCenter();
+    const statusLabel={none:'',active:'▶',done:'✓'}[z.status||'none'];
+    if(statusLabel){
+      const lbl=L.marker(center,{icon:L.divIcon({className:'',html:`<div style="background:${z.color};color:#fff;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap">${statusLabel} ${z.name||''}</div>`,iconAnchor:[40,10]})}).addTo(map);
+      zoneLyrs[z.id+'_lbl']=lbl;
+    }
     zoneLyrs[z.id]=lyr;
     if(z.route&&z.route.length>1){
       const pts=z.route.map(id=>{const h=houses.find(x=>x.id===id);return h?[h.lat,h.lng]:null;}).filter(Boolean);
       if(pts.length>1)routeLines[z.id]=L.polyline(pts,{color:z.color,weight:2,opacity:.5,dashArray:'8,5'}).addTo(map);
     }
   });
+  // Live location markers
+  Object.values(locMkrs).forEach(m=>map.removeLayer(m));locMkrs={};
+  if(curUser==='admin'){
+    locations.forEach(loc=>{
+      const live=isLive(loc.rep);
+      if(!live)return;
+      const m=L.marker([loc.lat,loc.lng],{icon:L.divIcon({className:'',
+        html:`<div style="background:${RCOL[loc.rep]||'#6366f1'};color:#fff;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4)">${loc.rep}</div>`,
+        iconAnchor:[30,10]})}).addTo(map);
+      locMkrs[loc.rep]=m;
+    });
+  }
+  // Heatmap
+  if(showHeat)renderHeat();
+}
+
+function renderHeat(){
+  if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}
+  if(!showHeat)return;
+  // Simple circle-based heatmap using Leaflet
+  const customerHouses=activity.filter(a=>a.st===3&&a.lat&&a.lng);
+  customerHouses.forEach(a=>{
+    const c=L.circle([a.lat,a.lng],{radius:60,color:'#16a34a',fillColor:'#16a34a',fillOpacity:.15,weight:0}).addTo(map);
+    if(!heatLayer)heatLayer=L.layerGroup();
+    heatLayer.addLayer?heatLayer.addLayer(c):null;
+  });
+}
+
+function toggleHeat(){
+  showHeat=!showHeat;
+  document.getElementById('bheat').className='mb'+(showHeat?' on':'');
+  if(!showHeat&&heatLayer){map.removeLayer(heatLayer);heatLayer=null;}
+  renderMap();
+}
+
+// ---- Export CSV ----
+function exportCSV(){
+  const rows=[['Adresse','Status','Selger','Tid','Notat']];
+  houses.forEach(h=>{
+    rows.push([h.addr,h.st!==null?STA[h.st]:'Ukjent',h.rep||'',h.ts||'',h.note||'']);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`trive-data-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
 }
 
 // ---- Mode ----
@@ -326,29 +538,27 @@ map.on('mousemove',e=>{
 function setMode(m){
   mode=m;if(m!=='draw')clrDraw();
   ['pin','draw','view'].forEach(x=>{
-    const b=document.getElementById('b'+x);
-    b.className='mb'+(x===m?(m==='draw'?' dn':' on'):'');
+    const b=document.getElementById('b'+x);if(b)b.className='mb'+(x===m?(m==='draw'?' dn':' on'):'');
   });
   map.getContainer().style.cursor=(m==='pin'||m==='draw')?'crosshair':'';
   if(m==='draw')setHint('Klikk for å tegne sone – klikk startpunkt for å lukke');
-  else if(m==='pin')setHint('Klikk på kartet for å markere et hus');
+  else if(m==='pin')setHint('Klikk på kartet for å markere hus');
   else setHint('');
 }
 function setHint(t){const el=document.getElementById('ht');el.textContent=t;el.style.display=t?'inline':'none';}
 function togglePanel(){
   panelOpen=!panelOpen;
   document.getElementById('rp').classList.toggle('hidden',!panelOpen);
-  document.getElementById('btoggle').textContent=panelOpen?'◀ Skjul panel':'▶ Vis panel';
+  document.getElementById('btoggle').textContent=panelOpen?'◀ Skjul':'▶ Vis';
   setTimeout(()=>map.invalidateSize(),210);
 }
 function toggleMapOnly(){
   mapOnly=!mapOnly;
   document.getElementById('map-stats').classList.toggle('vis',mapOnly&&curUser==='admin');
-  const rp=document.getElementById('rp');
-  if(mapOnly){rp.classList.add('hidden');panelOpen=false;}
-  else{rp.classList.remove('hidden');panelOpen=true;}
+  document.getElementById('rp').classList.toggle('hidden',mapOnly);
+  if(!mapOnly)panelOpen=true;
   document.getElementById('bmaponly').className='mb'+(mapOnly?' on':'');
-  document.getElementById('btoggle').textContent=panelOpen?'◀ Skjul panel':'▶ Vis panel';
+  document.getElementById('btoggle').textContent='◀ Skjul';
   setTimeout(()=>map.invalidateSize(),210);
   renderMapStats();
 }
@@ -359,11 +569,11 @@ function onUserChange(){
 }
 function swRp(t){
   rpTab=t;
-  document.querySelectorAll('.rpt').forEach((el,i)=>el.classList.toggle('on',['stats','soner','hus'][i]===t));
+  document.querySelectorAll('.rpt').forEach((el,i)=>el.classList.toggle('on',['stats','board','log','soner','hus'][i]===t));
   renderPanel();
 }
 
-// ---- Draw zone ----
+// ---- Draw ----
 function addDPt(ll){
   dpPts.push(ll);
   const dm=L.circleMarker([ll.lat,ll.lng],{radius:5,color:'#fff',fillColor:'#7c3aed',fillOpacity:1,weight:2}).addTo(map);
@@ -378,15 +588,13 @@ async function finishDraw(){
   const color=ZCOLS[zones.length%ZCOLS.length];
   const inside=houses.filter(h=>pip(h.lat,h.lng,pts));
   const route=nn(inside);
-  const newZone={id:Date.now(),pts:pts.map(p=>({lat:p.lat,lng:p.lng})),color,reps:[],name:'',created:new Date().toLocaleString('no'),route};
-  setSyncDot('loading');
-  const{error}=await sb.from('zones').upsert(newZone);
-  if(error){setSyncDot('err');console.error(error);return;}
-  setSyncDot('ok');
-  setHint('✓ Sone opprettet med '+inside.length+' hus');
-  setMode('view');
+  const nz={id:Date.now(),pts:pts.map(p=>({lat:p.lat,lng:p.lng})),color,reps:[],name:'',created:new Date().toLocaleString('no'),route,status:'none'};
+  setSyncDot('syn');
+  const{error}=await sb.from('zones').upsert(nz);
+  if(error){setSyncDot('err');return;}
+  setSyncDot('ok');setHint('✓ Sone opprettet med '+inside.length+' hus');setMode('view');
   await loadAll();
-  setTimeout(()=>{const z=zones.find(x=>x.id===newZone.id);if(z)openZPop(z.id);},300);
+  setTimeout(()=>{const z=zones.find(x=>x.id===nz.id);if(z)openZPop(z.id);},300);
 }
 function pip(lat,lng,pts){
   let ins=false;
@@ -411,6 +619,10 @@ function onHouseClick(id){
   if(mode==='draw')return;
   editId=id;pendLL=null;
   const h=houses.find(x=>x.id===id);if(!h)return;
+  // Show knock history
+  const hist=activity.filter(a=>a.house_id===id).slice(0,5);
+  document.getElementById('knock-hist').innerHTML=hist.length?`<div class="sec-title">Historikk (${hist.length} banker)</div>`+
+    hist.map(a=>`<div class="hknock-item"><span class="badge b${a.st}">${STA[a.st]}</span><span style="flex:1;color:var(--mu);font-size:10px">${a.rep||'Ukjent'}</span><span style="font-size:10px;color:var(--mu)">${new Date(a.ts).toLocaleDateString('no')}</span></div>`).join(''):'';
   openPop('Oppdater hus',h.addr,h.note||'',h.st,true);
   document.getElementById('prep').value=h.rep||'';
 }
@@ -428,39 +640,25 @@ function setSt(i){selSt=i;document.querySelectorAll('.so').forEach((el,j)=>el.cl
 async function saveH(){
   const note=document.getElementById('pnote').value;
   const rep=document.getElementById('prep').value;
-  setSyncDot('loading');
+  setSyncDot('syn');
   if(editId){
     const h=houses.find(x=>x.id===editId);
     if(h){
-      const upd={...h,st:selSt,note,rep:rep||h.rep};
-      const{error}=await sb.from('houses').upsert(upd);
-      if(!error&&selSt!==null){
-        await sb.from('activity').insert({id:Date.now()+'_'+Math.random(),house_id:h.id,st:selSt,rep:rep||h.rep,lat:h.lat,lng:h.lng});
-      }
-      if(error){setSyncDot('err');console.error(error);}else setSyncDot('ok');
+      await sb.from('houses').upsert({...h,st:selSt,note,rep:rep||h.rep});
+      if(selSt!==null)await sb.from('activity').insert({id:Date.now()+'_'+Math.random(),house_id:h.id,st:selSt,rep:rep||h.rep,lat:h.lat,lng:h.lng});
     }
   } else {
-    if(!pendLL){setSyncDot('err');return;}
+    if(!pendLL)return;
     const id=Date.now();
     const h={id,lat:pendLL.lat,lng:pendLL.lng,st:selSt,note,rep,addr:`${pendLL.lat.toFixed(4)}, ${pendLL.lng.toFixed(4)}`,ts:new Date().toISOString()};
-    const{error}=await sb.from('houses').insert(h);
-    if(!error&&selSt!==null){
-      await sb.from('activity').insert({id:id+'_a',house_id:id,st:selSt,rep,lat:h.lat,lng:h.lng});
-    }
-    if(error){setSyncDot('err');console.error(error);}else setSyncDot('ok');
+    await sb.from('houses').insert(h);
+    if(selSt!==null)await sb.from('activity').insert({id:id+'_a',house_id:id,st:selSt,rep,lat:h.lat,lng:h.lng});
   }
-  closePop();await loadAll();
+  setSyncDot('ok');closePop();await loadAll();
 }
 async function delH(){
   if(!editId)return;
-  setSyncDot('loading');
   await sb.from('houses').delete().eq('id',editId);
-  zones.forEach(async z=>{
-    if(z.route&&z.route.includes(editId)){
-      const nr=z.route.filter(x=>x!==editId);
-      await sb.from('zones').update({route:nr}).eq('id',z.id);
-    }
-  });
   setSyncDot('ok');closePop();await loadAll();
 }
 function closePop(){document.getElementById('ov').classList.remove('vis');editId=null;pendLL=null;selSt=null;}
@@ -471,6 +669,7 @@ function openZPop(zid){
   const z=zones.find(x=>x.id===zid);if(!z)return;
   document.getElementById('ztitle').innerHTML=`<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:${z.color};margin-right:6px;vertical-align:middle"></span>${z.name||'Sone'} – ${(z.route||[]).length} hus`;
   document.getElementById('zname').value=z.name||'';
+  document.getElementById('zstatus').value=z.status||'none';
   document.getElementById('zmeta').textContent=`Opprettet: ${z.created}`;
   const reps=z.reps||[];
   document.getElementById('zrep-grid').innerHTML=REPS.map(r=>`<label class="rep-check${reps.includes(r)?' sel':''}" onclick="this.classList.toggle('sel')">
@@ -482,32 +681,68 @@ async function saveZone(){
   const z=zones.find(x=>x.id===editZoneId);if(!z)return;
   const reps=[...document.querySelectorAll('#zrep-grid .rep-check.sel')].map(el=>el.querySelector('span:last-child').textContent);
   const name=document.getElementById('zname').value;
-  setSyncDot('loading');
-  const{error}=await sb.from('zones').update({name,reps}).eq('id',editZoneId);
-  if(error){setSyncDot('err');}else setSyncDot('ok');
-  closeZPop();await loadAll();
+  const status=document.getElementById('zstatus').value;
+  setSyncDot('syn');
+  await sb.from('zones').update({name,reps,status}).eq('id',editZoneId);
+  setSyncDot('ok');closeZPop();await loadAll();
 }
 async function deleteZone(){
-  setSyncDot('loading');
   await sb.from('zones').delete().eq('id',editZoneId);
   setSyncDot('ok');closeZPop();await loadAll();
 }
 function closeZPop(){document.getElementById('zov').classList.remove('vis');editZoneId=null;}
 
+// ---- Goals ----
+function openGPop(){
+  document.getElementById('goal-inputs').innerHTML=REPS.map(r=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${RCOL[r]}"></span>
+      <span style="font-size:12px;flex:1">${r}</span>
+      <input type="number" id="goal-${r}" value="${goals[r]||50}" min="1" max="500" style="width:70px;background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:4px 8px;border-radius:var(--ra);font-size:12px">
+    </div>`).join('');
+  document.getElementById('gov').classList.add('vis');
+}
+async function saveGoals(){
+  const upserts=REPS.map(r=>({rep:r,daily_target:parseInt(document.getElementById('goal-'+r)?.value||50)}));
+  await sb.from('goals').upsert(upserts);
+  closeGPop();await loadAll();
+}
+function closeGPop(){document.getElementById('gov').classList.remove('vis');}
+
+// ---- Comments ----
+function openCPop(rep){
+  commentRep=rep;
+  document.getElementById('cotitle').textContent=`Kommentarer – ${rep}`;
+  document.getElementById('cosub').textContent='';
+  const repComments=comments.filter(c=>c.rep===rep);
+  document.getElementById('comment-list').innerHTML=repComments.length?repComments.slice(0,5).map(c=>`<div class="comment-item"><div class="comment-meta">${c.admin||'Admin'} · ${new Date(c.ts).toLocaleDateString('no')}</div><div>${c.text}</div></div>`).join(''):'<div style="color:var(--mu);font-size:12px;margin-bottom:8px">Ingen kommentarer ennå</div>';
+  document.getElementById('cotext').value='';
+  document.getElementById('cov').classList.add('vis');
+}
+async function saveComment(){
+  const txt=document.getElementById('cotext').value.trim();
+  if(!txt||!commentRep)return;
+  await sb.from('comments').insert({id:Date.now()+'_c',rep:commentRep,admin:'Admin',text:txt});
+  await loadAll();
+  openCPop(commentRep);
+}
+function closeCPop(){document.getElementById('cov').classList.remove('vis');commentRep=null;}
+
 // ---- Render panel ----
 function renderPanel(){
   const el=document.getElementById('rp-body');
   if(rpTab==='stats')el.innerHTML=renderStats();
+  else if(rpTab==='board')el.innerHTML=renderLeaderboard();
+  else if(rpTab==='log')el.innerHTML=renderLog();
   else if(rpTab==='soner')el.innerHTML=renderZoneList();
   else el.innerHTML=renderHouseList();
 }
 
 function renderStats(){
-  const PLABELS={24:'24t','7d':'7d','31d':'31d',month:'Mnd',avg:'Snitt'};
   let html=`<div class="pt-row">${['24h','7d','31d','month','avg'].map((p,i)=>`<button class="pt${p===msPer?' on':''}" onclick="setPeriod('${p}')">${['24t','7d','31d','Mnd','Snitt'][i]}</button>`).join('')}</div>`;
   const rep=curUser==='admin'?null:curUser;
   const s=getStats(msPer,rep);
-  html+=`<div class="sec-title">${rep||'Total statistikk'}${msPer==='avg'?' – dagsnitt':''}</div>`;
+  html+=`<div class="sec-title">${rep||'Total'}${msPer==='avg'?' – dagsnitt':''}</div>`;
   html+=`<div class="sc-grid">
     <div class="sc" style="border-color:#64748b"><div class="sc-val">${s.total}</div><div class="sc-lbl">Totalt</div></div>
     <div class="sc" style="border-color:${SCOL[3]}"><div class="sc-val" style="color:${SCOL[3]}">${s.counts[3]}</div><div class="sc-lbl">Nye kunder</div><div class="sc-sub">${s.rate}% konv.</div></div>
@@ -516,54 +751,134 @@ function renderStats(){
     <div class="sc" style="border-color:${SCOL[2]}"><div class="sc-val" style="color:${SCOL[2]}">${s.counts[2]}</div><div class="sc-lbl">Ikke interessert</div></div>
     <div class="sc" style="border-color:#6366f1"><div class="sc-val" style="color:#6366f1">${s.rate}%</div><div class="sc-lbl">Konvertering</div></div>
   </div>`;
+
+  // 7-day trend
+  const trend=getTrend(rep);
+  const maxT=Math.max(...trend.map(t=>t.total),1);
+  html+=`<div class="divider"></div><div class="sec-title">Siste 7 dager</div>
+    <div class="trend-wrap">
+      <div class="trend-bars">${trend.map(t=>`
+        <div class="trend-bar" style="background:${SCOL[0]};height:${Math.round(t.total/maxT*100)}%;opacity:.7" data-tip="${t.label}: ${t.total} banker, ${t.customers} kunder"></div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--mu);margin-top:2px">${trend.map(t=>`<span>${t.label}</span>`).join('')}</div>
+    </div>`;
+
   if(curUser==='admin'){
-    html+=`<div class="divider"></div><div class="sec-title">Per selger</div>`;
+    html+=`<div class="divider"></div>
+      <div style="display:flex;align-items:center;margin-bottom:8px">
+        <span class="sec-title" style="margin:0">Per selger</span>
+        <button onclick="openGPop()" style="margin-left:auto;background:none;border:none;color:var(--ind);cursor:pointer;font-size:11px">⚙ Mål</button>
+      </div>`;
     html+=REPS.map(r=>{
       const rs=getStats(msPer,r);
-      if(!rs.total&&msPer!=='avg')return'';
+      const goal=goals[r]||50;
+      const todayActs=actIn('24h',r);
+      const todayCount=todayActs.length;
+      const goalPct=Math.min(100,Math.round(todayCount/goal*100));
+      const live=isLive(r);
+      const seen=lastSeen(r);
       const tot=Math.max(rs.total,1);
+      const repComments=comments.filter(c=>c.rep===r).length;
       return `<div class="srep" onclick="document.getElementById('usel').value='${r}';onUserChange()">
         <div class="srep-hdr">
-          <div style="width:9px;height:9px;border-radius:50%;background:${RCOL[r]}"></div>
+          <span>${live?'<span class="live-dot"></span>':'<span class="offline-dot"></span>'}</span>
+          <div style="width:8px;height:8px;border-radius:50%;background:${RCOL[r]}"></div>
           <span style="font-size:12px;font-weight:600">${r}</span>
-          <span style="margin-left:auto;font-size:11px;color:var(--mu)">${rs.total} banker</span>
-          <span style="margin-left:6px;font-size:11px;font-weight:700;color:${SCOL[3]}">${rs.rate}%</span>
+          <span style="font-size:10px;color:var(--mu);margin-left:auto">${seen}</span>
+          <button onclick="event.stopPropagation();openCPop('${r}')" style="background:none;border:none;color:${repComments?'#6366f1':'var(--mu)'};cursor:pointer;font-size:13px;padding:0 2px" title="Kommentarer">💬${repComments?`<sup style="font-size:9px">${repComments}</sup>`:''}</button>
         </div>
         <div class="srep-mini">
           <span style="color:${SCOL[3]}">● ${rs.counts[3]} kunder</span>
           <span style="color:${SCOL[0]}">● ${rs.counts[0]} borte</span>
-          <span style="color:${SCOL[2]}">● ${rs.counts[2]} nei</span>
+          <span style="color:var(--mu)">${rs.rate}% konv.</span>
         </div>
-        <div class="srep-bar-wrap" style="margin-top:5px">
-          ${[3,0,1,2].map(i=>`<div class="srep-bar" style="width:${Math.round(rs.counts[i]/tot*100)}%;background:${SCOL[i]}"></div>`).join('')}
+        <div class="srep-bar-wrap" style="margin-top:4px">
+          ${[3,0,1,2].map(i=>`<div style="height:4px;width:${Math.round(rs.counts[i]/tot*100)}%;background:${SCOL[i]};border-radius:2px"></div>`).join('')}
+        </div>
+        <div style="margin-top:5px">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-bottom:2px"><span>Dagsmål: ${todayCount}/${goal}</span><span>${goalPct}%</span></div>
+          <div class="goal-bar"><div class="goal-bar-fill" style="width:${goalPct}%;background:${goalPct>=100?SCOL[3]:RCOL[r]}"></div></div>
         </div>
       </div>`;
     }).join('');
-    if(curUser!=='admin'){
-      const mz=zones.filter(z=>(z.reps||[]).includes(curUser));
-      if(mz.length){html+=`<div class="divider"></div><div class="sec-title">Mine soner</div>`;html+=mz.map(z=>`<div class="zc" style="background:${z.color}11;border-color:${z.color}33" onclick="openZPop(${z.id})"><div class="zc-hdr"><div class="zc-dot" style="background:${z.color}"></div><span style="font-size:12px;font-weight:600">${z.name||'Sone'}</span><span style="margin-left:auto;font-size:11px;color:var(--mu)">${(z.route||[]).length} hus</span></div></div>`).join('');}
+  } else {
+    // Personal zone list
+    const mz=zones.filter(z=>(z.reps||[]).includes(curUser));
+    if(mz.length){
+      html+=`<div class="divider"></div><div class="sec-title">Mine soner</div>`;
+      html+=mz.map(z=>`<div class="zc" style="background:${z.color}11;border-color:${z.color}33" onclick="openZPop(${z.id})">
+        <div class="zc-hdr"><div class="zc-dot" style="background:${z.color}"></div>
+        <span style="font-size:12px;font-weight:600">${z.name||'Sone'}</span>
+        <span class="zone-status ${z.status==='done'?'zs-done':z.status==='active'?'zs-active':'zs-none'}" style="margin-left:auto">${{none:'Ikke startet',active:'Pågående',done:'Ferdig'}[z.status||'none']}</span></div>
+        <div style="font-size:10px;color:var(--mu)">${(z.route||[]).length} hus · ${z.created}</div></div>`).join('');
     }
   }
+
+  if(curUser==='admin')html+=`<div class="divider"></div><button class="exp-btn" onclick="exportCSV()">↓ Eksporter alt til CSV</button>`;
   return html;
 }
 
+function renderLeaderboard(){
+  const METRICS=[
+    {key:'rate',label:'Konverteringsrate',fn:r=>getStats(msPer,r).rate,fmt:v=>v+'%'},
+    {key:'total',label:'Antall banker',fn:r=>getStats(msPer,r).total,fmt:v=>v},
+    {key:'customers',label:'Nye kunder',fn:r=>getStats(msPer,r).counts[3],fmt:v=>v},
+  ];
+  let html=`<div class="pt-row">${['24h','7d','31d','month','avg'].map((p,i)=>`<button class="pt${p===msPer?' on':''}" onclick="setPeriod('${p}')">${['24t','7d','31d','Mnd','Snitt'][i]}</button>`).join('')}</div>`;
+  const medals=['🥇','🥈','🥉'];
+  METRICS.forEach(m=>{
+    const sorted=REPS.map(r=>({rep:r,val:m.fn(r)})).sort((a,b)=>b.val-a.val).filter(x=>x.val>0||msPer==='avg');
+    html+=`<div class="sec-title">${m.label}</div>`;
+    html+=sorted.slice(0,10).map((x,i)=>`<div class="lb-row">
+      <span class="lb-rank">${medals[i]||i+1}</span>
+      <div style="width:9px;height:9px;border-radius:50%;background:${RCOL[x.rep]}"></div>
+      <span class="lb-name">${x.rep}</span>
+      <div><div class="lb-val" style="color:${i===0?SCOL[3]:'var(--tx)'}">${m.fmt(x.val)}</div></div>
+    </div>`).join('')||'<div class="empty">Ingen data ennå</div>';
+    html+=`<div class="divider"></div>`;
+  });
+  return html;
+}
+
+function renderLog(){
+  const recent=activity.slice(0,100);
+  if(!recent.length)return`<div class="empty">Ingen aktivitet registrert ennå</div>`;
+  // Group by date
+  const byDate={};
+  recent.forEach(a=>{
+    const d=new Date(a.ts).toLocaleDateString('no',{weekday:'long',day:'numeric',month:'short'});
+    if(!byDate[d])byDate[d]=[];
+    byDate[d].push(a);
+  });
+  return Object.entries(byDate).map(([date,acts])=>`
+    <div class="sec-title">${date}</div>
+    ${acts.map(a=>`<div class="al-row">
+      <span class="al-time">${new Date(a.ts).toLocaleTimeString('no',{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="al-rep" style="color:${RCOL[a.rep]||'var(--mu)'}">${a.rep||'?'}</span>
+      <span class="badge b${a.st}">${STA[a.st]}</span>
+    </div>`).join('')}
+    <div class="divider"></div>`).join('');
+}
+
 function renderZoneList(){
-  if(!zones.length)return`<div class="empty"><div class="draw-tip">Trykk <b>⬡ Tegn sone</b> og tegn et polygon rundt husene.</div></div>`;
+  if(!zones.length)return`<div class="empty"><div class="draw-tip">Trykk <b>⬡ Sone</b> og tegn et polygon rundt husene.</div></div>`;
   return zones.map(z=>{
     const repBadges=(z.reps||[]).map(r=>`<span style="background:${RCOL[r]||'#555'}22;color:${RCOL[r]||'#aaa'};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500">${r}</span>`).join(' ');
-    const houseRows=(z.route||[]).slice(0,4).map((id,i)=>{
+    const statusCls=z.status==='done'?'zs-done':z.status==='active'?'zs-active':'zs-none';
+    const statusLbl={none:'Ikke startet',active:'Pågående',done:'Ferdig'}[z.status||'none'];
+    const houseRows=(z.route||[]).slice(0,3).map((id,i)=>{
       const h=houses.find(x=>x.id===id);if(!h)return'';
       const b=h.st!==null?`<span class="badge b${h.st}" style="font-size:9px">${STA[h.st]}</span>`:'';
       return `<div style="display:flex;align-items:center;gap:4px;padding:2px 0;font-size:10px;color:var(--mu)"><span class="rnum" style="background:${z.color}">${i+1}</span><span>${h.addr}</span>${b}</div>`;
     }).join('');
-    const more=(z.route||[]).length>4?`<div style="font-size:10px;color:var(--mu);padding:2px 4px">+${z.route.length-4} til…</div>`:'';
+    const more=(z.route||[]).length>3?`<div style="font-size:10px;color:var(--mu)">+${z.route.length-3} til…</div>`:'';
     return `<div class="zc" style="background:${z.color}11;border-color:${z.color}33" onclick="openZPop(${z.id})">
       <div class="zc-hdr"><div class="zc-dot" style="background:${z.color}"></div>
         <span style="font-size:12px;font-weight:600">${z.name||'Sone'}</span>
-        <span style="margin-left:auto;font-size:11px;color:var(--mu)">${(z.route||[]).length} hus</span>
+        <span class="zone-status ${statusCls}" style="margin-left:auto">${statusLbl}</span>
       </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">${repBadges||'<span style="font-size:10px;color:var(--mu)">Ingen tildelt</span>'}</div>
-      <div style="font-size:10px;color:var(--mu);margin-bottom:5px">${z.created}</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px">${repBadges||'<span style="font-size:10px;color:var(--mu)">Ingen tildelt</span>'}</div>
+      <div style="font-size:10px;color:var(--mu);margin-bottom:4px">${z.created} · ${(z.route||[]).length} hus</div>
       ${houseRows}${more}
     </div>`;
   }).join('');
@@ -575,8 +890,9 @@ function renderHouseList(){
   return list.slice().reverse().slice(0,100).map(h=>{
     const b=h.st===null?'<span class="badge bn">Ukjent</span>':`<span class="badge b${h.st}">${STA[h.st]}</span>`;
     const rb=h.rep?`<span style="background:${RCOL[h.rep]||'#555'}22;color:${RCOL[h.rep]||'#aaa'};padding:2px 5px;border-radius:4px;font-size:10px">${h.rep}</span>`:'';
+    const knocks=activity.filter(a=>a.house_id===h.id).length;
     return `<div class="hi" onclick="onHouseClick(${h.id})"><div class="ha">${h.addr}</div>
-      <div class="hm">${b}${rb}</div>
+      <div class="hm">${b}${rb}${knocks>1?`<span style="color:var(--mu)">banket ${knocks}x</span>`:''}</div>
       ${h.note?`<div style="font-size:10px;color:var(--mu);margin-top:2px">${h.note}</div>`:''}</div>`;
   }).join('');
 }
@@ -598,16 +914,19 @@ function renderMapStats(){
     <div class="ms-cell"><div class="ms-val" style="color:${SCOL[0]}">${s.counts[0]}</div><div class="ms-lbl">Borte</div></div>
     <div class="ms-cell"><div class="ms-val" style="color:${SCOL[2]}">${s.counts[2]}</div><div class="ms-lbl">Nei</div></div>
     <div class="ms-cell"><div class="ms-val" style="color:${SCOL[1]}">${s.counts[1]}</div><div class="ms-lbl">Allerede</div></div>`;
-  document.getElementById('ms-reps').innerHTML=`<div style="font-size:10px;color:var(--mu);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;border-top:1px solid var(--bo);padding-top:8px">Per selger</div>`+
-    REPS.map(r=>{const rs=getStats(msPer,r);if(!rs.total&&msPer!=='avg')return'';
-      return `<div class="ms-rep-row"><div class="ms-rep-dot" style="background:${RCOL[r]}"></div><span style="flex:1">${r}</span><span style="color:var(--mu)">${rs.total}</span><span style="color:${SCOL[3]};margin-left:8px;font-weight:700">${rs.rate}%</span></div>`;
+  document.getElementById('ms-reps').innerHTML=`<div style="font-size:10px;color:var(--mu);margin-bottom:5px;font-weight:600;border-top:1px solid var(--bo);padding-top:7px">Per selger</div>`+
+    REPS.map(r=>{
+      const rs=getStats(msPer,r);if(!rs.total&&msPer!=='avg')return'';
+      const live=isLive(r);
+      return `<div class="ms-rep-row"><div class="ms-rep-dot" style="background:${RCOL[r]}"></div>${live?'<span class="live-dot" style="width:5px;height:5px"></span>':''}<span style="flex:1">${r}</span><span style="color:var(--mu)">${rs.total}</span><span style="color:${SCOL[3]};margin-left:7px;font-weight:700">${rs.rate}%</span></div>`;
     }).join('');
 }
 
+// ---- Auto-ping to keep Supabase alive ----
+setInterval(async()=>{await sb.from('houses').select('id').limit(1);},432000000); // every 5 days
+
 // ---- Init ----
-setMode('pin');
-loadAll();
-setupRealtime();
+setMode('pin');loadAll();setupRealtime();
 </script>
 </body>
 </html>
