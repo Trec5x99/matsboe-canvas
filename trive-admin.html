@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trive Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --g:#16a34a;--gl:#dcfce7;--gd:#14532d;
+  --r:#dc2626;--rl:#fee2e2;--rd:#7f1d1d;
+  --a:#d97706;--al:#fef3c7;--ad:#78350f;
+  --b:#2563eb;--bl:#dbeafe;--bd:#1e3a8a;
+  --ind:#6366f1;--ind2:#4f46e5;
+  --bg:#0f172a;--su:#1e293b;--su2:#334155;
+  --bo:#475569;--tx:#f1f5f9;--mu:#94a3b8;--ra:8px
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#tb{background:var(--su);border-bottom:1px solid var(--bo);padding:9px 14px;display:flex;align-items:center;gap:9px;flex-shrink:0;flex-wrap:wrap}
+h1{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.5px}
+h1 em{color:var(--ind);font-style:normal}
+.usel{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:5px 9px;border-radius:var(--ra);font-size:12px;cursor:pointer;min-width:130px}
+.mb{background:var(--su2);border:1px solid var(--bo);color:var(--mu);padding:5px 11px;border-radius:var(--ra);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.mb.on{background:var(--ind);border-color:var(--ind);color:#fff}
+.mb.dn{background:#7c3aed;border-color:#7c3aed;color:#fff}
+#ht{font-size:11px;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:var(--ra);padding:3px 9px}
+.tb-r{margin-left:auto;display:flex;gap:7px;align-items:center}
+#sync-dot{width:8px;height:8px;border-radius:50%;background:#64748b;flex-shrink:0;transition:background .3s}
+#sync-dot.ok{background:#16a34a}
+#sync-dot.err{background:#dc2626}
+#sync-dot.loading{background:#d97706;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#mn{display:flex;flex:1;overflow:hidden}
+#mp{flex:1;z-index:1;position:relative}
+#rp{width:300px;background:var(--su);border-left:1px solid var(--bo);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;transition:width .2s}
+#rp.hidden{width:0;overflow:hidden;border-left:none}
+#rp-inner{width:300px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+#rp-tabs{display:flex;border-bottom:1px solid var(--bo);flex-shrink:0}
+.rpt{flex:1;padding:9px 4px;text-align:center;font-size:11px;cursor:pointer;color:var(--mu);border:none;background:none;white-space:nowrap}
+.rpt.on{color:var(--ind);border-bottom:2px solid var(--ind)}
+#rp-body{flex:1;overflow-y:auto;padding:12px}
+.pt-row{display:flex;background:var(--su2);border-radius:var(--ra);padding:3px;gap:2px;margin-bottom:14px}
+.pt{flex:1;padding:5px 3px;border-radius:6px;text-align:center;font-size:10px;cursor:pointer;color:var(--mu);border:none;background:none}
+.pt.on{background:var(--ind);color:#fff;font-weight:500}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sc{background:var(--su2);border-radius:var(--ra);padding:10px;border-left:3px solid transparent}
+.sc-val{font-size:22px;font-weight:700;margin-bottom:2px}
+.sc-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px}
+.sc-sub{font-size:10px;color:var(--mu);margin-top:2px}
+.srep{background:var(--su2);border-radius:var(--ra);padding:9px;margin-bottom:7px;cursor:pointer;border:1px solid transparent}
+.srep:hover{border-color:var(--bo)}
+.srep-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.srep-bar-wrap{display:flex;gap:2px;height:4px;border-radius:2px;overflow:hidden;margin-top:5px}
+.srep-bar{height:100%}
+.srep-mini{display:flex;gap:8px;font-size:10px;color:var(--mu)}
+.zc{border-radius:var(--ra);padding:9px;margin-bottom:7px;border:1px solid rgba(255,255,255,.07);cursor:pointer}
+.zc:hover{border-color:rgba(255,255,255,.18)}
+.zc-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.zc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.hi{background:var(--su2);border-radius:var(--ra);padding:8px;margin-bottom:6px;cursor:pointer;border:1px solid transparent}
+.hi:hover{border-color:var(--bo)}
+.ha{font-size:12px;font-weight:500;margin-bottom:2px}
+.hm{font-size:10px;color:var(--mu);display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:500}
+.bn{background:var(--su2);color:var(--mu)}
+.b0{background:var(--al);color:var(--ad)}
+.b1{background:var(--bl);color:var(--bd)}
+.b2{background:var(--rl);color:var(--rd)}
+.b3{background:var(--gl);color:var(--gd)}
+#map-stats{position:absolute;top:12px;left:12px;z-index:500;background:rgba(15,23,42,.9);border:1px solid var(--bo);border-radius:10px;padding:12px 14px;display:none;min-width:250px}
+#map-stats.vis{display:block}
+#map-stats h4{font-size:12px;font-weight:600;margin-bottom:10px;color:#fff;display:flex;align-items:center;gap:8px}
+.ms-period{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
+.msp{padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer;background:var(--su2);color:var(--mu);border:none}
+.msp.on{background:var(--ind);color:#fff}
+.ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.ms-cell{text-align:center}
+.ms-val{font-size:16px;font-weight:700}
+.ms-lbl{font-size:9px;color:var(--mu);margin-top:1px}
+.ms-rep-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px}
+.ms-rep-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+#ov,#zov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center}
+#ov.vis,#zov.vis{display:flex}
+.pop{background:var(--su);border:1px solid var(--bo);border-radius:12px;padding:18px;width:320px;max-width:calc(100vw - 24px)}
+.pop h3{font-size:14px;font-weight:600;margin-bottom:3px}
+.pop-sub{font-size:11px;color:var(--mu);margin-bottom:14px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
+.so{padding:10px 8px;border-radius:var(--ra);border:2px solid transparent;cursor:pointer;text-align:center;font-size:12px;font-weight:500}
+.so0{background:var(--al);color:var(--ad)}.so0.sl,.so0:hover{border-color:var(--a)}
+.so1{background:var(--bl);color:var(--bd)}.so1.sl,.so1:hover{border-color:var(--b)}
+.so2{background:var(--rl);color:var(--rd)}.so2.sl,.so2:hover{border-color:var(--r)}
+.so3{background:var(--gl);color:var(--gd)}.so3.sl,.so3:hover{border-color:var(--g)}
+textarea.nt{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:6px 9px;border-radius:var(--ra);font-size:11px;width:100%;margin-bottom:10px;resize:none;height:50px}
+textarea.nt::placeholder{color:var(--mu)}
+.fi{background:var(--su2);border:1px solid var(--bo);color:var(--tx);padding:6px 9px;border-radius:var(--ra);font-size:12px;width:100%;margin-bottom:10px}
+.flbl{font-size:11px;color:var(--mu);margin-bottom:4px;display:block}
+.pact{display:flex;gap:7px}
+.btn{padding:7px 12px;border-radius:var(--ra);border:none;cursor:pointer;font-size:12px;font-weight:500}
+.bp{background:var(--ind);color:#fff;flex:1}.bp:hover{background:var(--ind2)}
+.bg{background:var(--su2);color:var(--mu)}.bg:hover{color:var(--tx)}
+.bd{background:var(--rl);color:var(--rd)}
+.rep-check-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px}
+.rep-check{display:flex;align-items:center;gap:6px;background:var(--su2);border-radius:var(--ra);padding:7px 9px;cursor:pointer;border:1px solid transparent;font-size:12px}
+.rep-check.sel{border-color:var(--ind);background:rgba(99,102,241,.1)}
+.empty{text-align:center;color:var(--mu);font-size:12px;padding:16px 8px;line-height:1.6}
+.draw-tip{background:rgba(124,58,237,.13);border:1px solid rgba(124,58,237,.35);border-radius:var(--ra);padding:9px 10px;font-size:11px;color:#c4b5fd;text-align:center;line-height:1.6;margin-bottom:8px}
+.sec-title{font-size:10px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px}
+.divider{border-top:1px solid var(--bo);margin:12px 0}
+.rnum{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-right:4px}
+</style>
+</head>
+<body>
+<div id="tb">
+  <h1>Trive <em>Admin</em></h1>
+  <select class="usel" id="usel" onchange="onUserChange()">
+    <option value="admin">👑 Admin</option>
+    <option>Mats</option><option>Emma</option><option>Jonas</option><option>Sara</option>
+    <option>Lars</option><option>Ida</option><option>Erik</option><option>Nora</option>
+    <option>Håkon</option><option>Lena</option>
+  </select>
+  <button class="mb on" id="bpin" onclick="setMode('pin')">＋ Marker hus</button>
+  <button class="mb" id="bdraw" onclick="setMode('draw')">⬡ Tegn sone</button>
+  <button class="mb" id="bview" onclick="setMode('view')">Vis</button>
+  <span id="ht" style="display:none"></span>
+  <div class="tb-r">
+    <div id="sync-dot" title="Synkroniseringsstatus"></div>
+    <button class="mb" id="bmaponly" onclick="toggleMapOnly()">⛶ Kart-modus</button>
+    <button class="mb" id="btoggle" onclick="togglePanel()">◀ Skjul panel</button>
+  </div>
+</div>
+<div id="mn">
+  <div id="mp">
+    <div id="map-stats">
+      <h4>Statistikk <span id="ms-period-lbl" style="color:var(--mu);font-weight:400;font-size:10px"></span></h4>
+      <div class="ms-period">
+        <button class="msp on" onclick="setMsPer('24h')">24t</button>
+        <button class="msp" onclick="setMsPer('7d')">7 dager</button>
+        <button class="msp" onclick="setMsPer('31d')">31 dager</button>
+        <button class="msp" onclick="setMsPer('month')">Mnd</button>
+        <button class="msp" onclick="setMsPer('avg')">Snitt</button>
+      </div>
+      <div class="ms-grid" id="ms-grid"></div>
+      <div id="ms-reps"></div>
+    </div>
+  </div>
+  <div id="rp">
+    <div id="rp-inner">
+      <div id="rp-tabs">
+        <button class="rpt on" onclick="swRp('stats')">Statistikk</button>
+        <button class="rpt" onclick="swRp('soner')">Soner</button>
+        <button class="rpt" onclick="swRp('hus')">Hus</button>
+      </div>
+      <div id="rp-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- House popup -->
+<div id="ov" onclick="if(event.target===this)closePop()">
+  <div class="pop">
+    <h3 id="ptitle">Marker hus</h3>
+    <div class="pop-sub" id="pa"></div>
+    <div class="sg">
+      <div class="so so0" onclick="setSt(0)">🏠 Ikke hjemme</div>
+      <div class="so so1" onclick="setSt(1)">✅ Allerede kunde</div>
+      <div class="so so2" onclick="setSt(2)">❌ Ikke interessert</div>
+      <div class="so so3" onclick="setSt(3)">🎉 Ble kunde nå</div>
+    </div>
+    <span class="flbl">Selger</span>
+    <select class="fi" id="prep">
+      <option value="">Ingen</option>
+      <option>Mats</option><option>Emma</option><option>Jonas</option><option>Sara</option>
+      <option>Lars</option><option>Ida</option><option>Erik</option><option>Nora</option>
+      <option>Håkon</option><option>Lena</option>
+    </select>
+    <textarea class="nt" id="pnote" placeholder="Notat…"></textarea>
+    <div class="pact">
+      <button class="btn bp" onclick="saveH()">Lagre</button>
+      <button class="btn bg" onclick="closePop()">Avbryt</button>
+      <button class="btn bd" id="delb" onclick="delH()" style="display:none">Slett</button>
+    </div>
+  </div>
+</div>
+
+<!-- Zone popup -->
+<div id="zov" onclick="if(event.target===this)closeZPop()">
+  <div class="pop">
+    <h3 id="ztitle">Sone</h3>
+    <div class="pop-sub" id="zmeta"></div>
+    <span class="flbl">Navn på sone</span>
+    <input class="fi" id="zname" placeholder="f.eks. Grünerløkka nord…">
+    <span class="flbl">Tildel selgere</span>
+    <div class="rep-check-grid" id="zrep-grid"></div>
+    <div class="pact">
+      <button class="btn bp" onclick="saveZone()">Lagre</button>
+      <button class="btn bg" onclick="closeZPop()">Avbryt</button>
+      <button class="btn bd" onclick="deleteZone()">Slett sone</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SURL='https://hfngvxguweydbsvyvmnd.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhmbmd2eGd1d2V5ZGJzdnl2bW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzY2NDIsImV4cCI6MjA5MTM1MjY0Mn0.iHJq-NfHtEKQX3dO3dP7_kQM1zSM0lHs7BVVMtHRoJY';
+const sb=supabase.createClient(SURL,SKEY);
+
+const REPS=['Mats','Emma','Jonas','Sara','Lars','Ida','Erik','Nora','Håkon','Lena'];
+const RCOL={Mats:'#6366f1',Emma:'#0891b2',Jonas:'#16a34a',Sara:'#ea580c',Lars:'#db2777',Ida:'#0d9488',Erik:'#d97706',Nora:'#84cc16',Håkon:'#8b5cf6',Lena:'#dc2626'};
+const STA=['Ikke hjemme','Allerede kunde','Ikke interessert','Ble kunde nå'];
+const SCOL=['#d97706','#2563eb','#dc2626','#16a34a'];
+const ZCOLS=['#7c3aed','#0891b2','#16a34a','#ea580c','#db2777','#0d9488','#d97706','#6366f1','#dc2626','#84cc16'];
+
+let houses=[],zones=[],activity=[];
+let mode='pin',rpTab='stats',curUser='admin',mapOnly=false,panelOpen=true,msPer='24h';
+let pendLL=null,editId=null,selSt=null,editZoneId=null;
+let mkrs={},zoneLyrs={},routeLines={};
+let dpPts=[],dpMkrs=[],dpLines=[],prevLine=null;
+
+const map=L.map('mp').setView([59.9139,10.7522],15);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  {attribution:'© OSM © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+
+function setSyncDot(state){const d=document.getElementById('sync-dot');d.className='';d.classList.add(state);}
+
+// ---- Load from Supabase ----
+async function loadAll(){
+  setSyncDot('loading');
+  try{
+    const [hRes,zRes,aRes]=await Promise.all([
+      sb.from('houses').select('*'),
+      sb.from('zones').select('*'),
+      sb.from('activity').select('*').order('ts',{ascending:false}).limit(5000)
+    ]);
+    if(hRes.error||zRes.error||aRes.error)throw new Error('Load error');
+    houses=hRes.data||[];
+    zones=(zRes.data||[]).map(z=>({...z,pts:z.pts||[],reps:z.reps||[],route:z.route||[]}));
+    activity=aRes.data||[];
+    setSyncDot('ok');
+    renderMap();renderPanel();renderMapStats();
+  }catch(e){setSyncDot('err');console.error(e);}
+}
+
+// ---- Realtime subscriptions ----
+function setupRealtime(){
+  sb.channel('changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'houses'},()=>loadAll())
+    .on('postgres_changes',{event:'*',schema:'public',table:'zones'},()=>loadAll())
+    .on('postgres_changes',{event:'*',schema:'public',table:'activity'},()=>loadAll())
+    .subscribe();
+}
+
+// ---- Time helpers ----
+function periodStart(p){
+  const d=new Date();
+  if(p==='24h')d.setHours(d.getHours()-24);
+  else if(p==='7d')d.setDate(d.getDate()-7);
+  else if(p==='31d')d.setDate(d.getDate()-31);
+  else if(p==='month'){d.setDate(1);d.setHours(0,0,0,0);}
+  else d.setFullYear(2000);
+  return d;
+}
+function actInPeriod(p,rep){
+  const start=periodStart(p);
+  return activity.filter(a=>new Date(a.ts)>=start&&(rep?a.rep===rep:true));
+}
+function calcStats(acts){
+  const total=acts.length;
+  const counts=[0,1,2,3].map(i=>acts.filter(a=>a.st===i).length);
+  const rate=total>0?Math.round(counts[3]/total*100):0;
+  return{total,counts,rate};
+}
+function avgPerDay(rep){
+  const acts=rep?activity.filter(a=>a.rep===rep):activity;
+  if(!acts.length)return{total:0,counts:[0,0,0,0],rate:0};
+  const days=Math.max(1,[...new Set(acts.map(a=>a.ts.slice(0,10)))].length);
+  const total=Math.round(acts.length/days);
+  const counts=[0,1,2,3].map(i=>Math.round(acts.filter(a=>a.st===i).length/days));
+  const rate=total>0?Math.round(counts[3]/total*100):0;
+  return{total,counts,rate};
+}
+function getStats(p,rep){return p==='avg'?avgPerDay(rep):calcStats(actInPeriod(p,rep));}
+
+// ---- Map ----
+function houseZoneColor(id){const z=zones.find(z=>z.route&&z.route.includes(id));return z?z.color:null;}
+function mkIcon(st,zc){
+  const c=st===null?'#64748b':SCOL[st];
+  const ring=zc?`box-shadow:0 0 0 3px ${zc},0 2px 8px rgba(0,0,0,.4);`:'box-shadow:0 2px 8px rgba(0,0,0,.4);';
+  return L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${c};border:2.5px solid #fff;${ring}cursor:pointer"></div>`,iconSize:[26,26],iconAnchor:[13,13]});
+}
+function renderMap(){
+  Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
+  const filtered=curUser==='admin'?houses:houses.filter(h=>h.rep===curUser);
+  filtered.forEach(h=>{
+    const m=L.marker([h.lat,h.lng],{icon:mkIcon(h.st,houseZoneColor(h.id))}).addTo(map);
+    m.on('click',()=>onHouseClick(h.id));mkrs[h.id]=m;
+  });
+  Object.values(zoneLyrs).forEach(l=>map.removeLayer(l));zoneLyrs={};
+  Object.values(routeLines).forEach(l=>map.removeLayer(l));routeLines={};
+  zones.forEach(z=>{
+    if(!z.pts||!z.pts.length)return;
+    const lyr=L.polygon(z.pts.map(p=>[p.lat,p.lng]),{color:z.color,fillColor:z.color,fillOpacity:.1,weight:2}).addTo(map);
+    lyr.on('click',e=>{L.DomEvent.stop(e);openZPop(z.id);});
+    zoneLyrs[z.id]=lyr;
+    if(z.route&&z.route.length>1){
+      const pts=z.route.map(id=>{const h=houses.find(x=>x.id===id);return h?[h.lat,h.lng]:null;}).filter(Boolean);
+      if(pts.length>1)routeLines[z.id]=L.polyline(pts,{color:z.color,weight:2,opacity:.5,dashArray:'8,5'}).addTo(map);
+    }
+  });
+}
+
+// ---- Mode ----
+map.on('click',e=>{
+  if(mode==='pin'){pendLL=e.latlng;editId=null;selSt=null;openPop('Nytt hus',`${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`,'',null,false);}
+  else if(mode==='draw'){addDPt(e.latlng);}
+});
+map.on('mousemove',e=>{
+  if(mode==='draw'&&dpPts.length>0){
+    if(prevLine)map.removeLayer(prevLine);
+    const last=dpPts[dpPts.length-1];
+    prevLine=L.polyline([[last.lat,last.lng],[e.latlng.lat,e.latlng.lng]],{color:'#a78bfa',weight:2,dashArray:'5,4',opacity:.6}).addTo(map);
+  }
+});
+function setMode(m){
+  mode=m;if(m!=='draw')clrDraw();
+  ['pin','draw','view'].forEach(x=>{
+    const b=document.getElementById('b'+x);
+    b.className='mb'+(x===m?(m==='draw'?' dn':' on'):'');
+  });
+  map.getContainer().style.cursor=(m==='pin'||m==='draw')?'crosshair':'';
+  if(m==='draw')setHint('Klikk for å tegne sone – klikk startpunkt for å lukke');
+  else if(m==='pin')setHint('Klikk på kartet for å markere et hus');
+  else setHint('');
+}
+function setHint(t){const el=document.getElementById('ht');el.textContent=t;el.style.display=t?'inline':'none';}
+function togglePanel(){
+  panelOpen=!panelOpen;
+  document.getElementById('rp').classList.toggle('hidden',!panelOpen);
+  document.getElementById('btoggle').textContent=panelOpen?'◀ Skjul panel':'▶ Vis panel';
+  setTimeout(()=>map.invalidateSize(),210);
+}
+function toggleMapOnly(){
+  mapOnly=!mapOnly;
+  document.getElementById('map-stats').classList.toggle('vis',mapOnly&&curUser==='admin');
+  const rp=document.getElementById('rp');
+  if(mapOnly){rp.classList.add('hidden');panelOpen=false;}
+  else{rp.classList.remove('hidden');panelOpen=true;}
+  document.getElementById('bmaponly').className='mb'+(mapOnly?' on':'');
+  document.getElementById('btoggle').textContent=panelOpen?'◀ Skjul panel':'▶ Vis panel';
+  setTimeout(()=>map.invalidateSize(),210);
+  renderMapStats();
+}
+function onUserChange(){
+  curUser=document.getElementById('usel').value;
+  if(mapOnly&&curUser!=='admin'){mapOnly=false;document.getElementById('map-stats').classList.remove('vis');document.getElementById('bmaponly').className='mb';}
+  renderMap();renderPanel();
+}
+function swRp(t){
+  rpTab=t;
+  document.querySelectorAll('.rpt').forEach((el,i)=>el.classList.toggle('on',['stats','soner','hus'][i]===t));
+  renderPanel();
+}
+
+// ---- Draw zone ----
+function addDPt(ll){
+  dpPts.push(ll);
+  const dm=L.circleMarker([ll.lat,ll.lng],{radius:5,color:'#fff',fillColor:'#7c3aed',fillOpacity:1,weight:2}).addTo(map);
+  if(dpPts.length===1){dm.on('click',e=>{L.DomEvent.stop(e);if(dpPts.length>=3)finishDraw();});dm.bindTooltip('Lukk her',{permanent:false});}
+  dpMkrs.push(dm);
+  if(dpPts.length>1){const pv=dpPts[dpPts.length-2];dpLines.push(L.polyline([[pv.lat,pv.lng],[ll.lat,ll.lng]],{color:'#7c3aed',weight:2.5,opacity:.8}).addTo(map));}
+  setHint(dpPts.length<3?`${dpPts.length} punkt`:`${dpPts.length} punkt – klikk startpunktet for å lukke`);
+}
+async function finishDraw(){
+  if(dpPts.length<3)return;
+  const pts=[...dpPts];clrDraw();
+  const color=ZCOLS[zones.length%ZCOLS.length];
+  const inside=houses.filter(h=>pip(h.lat,h.lng,pts));
+  const route=nn(inside);
+  const newZone={id:Date.now(),pts:pts.map(p=>({lat:p.lat,lng:p.lng})),color,reps:[],name:'',created:new Date().toLocaleString('no'),route};
+  setSyncDot('loading');
+  const{error}=await sb.from('zones').upsert(newZone);
+  if(error){setSyncDot('err');console.error(error);return;}
+  setSyncDot('ok');
+  setHint('✓ Sone opprettet med '+inside.length+' hus');
+  setMode('view');
+  await loadAll();
+  setTimeout(()=>{const z=zones.find(x=>x.id===newZone.id);if(z)openZPop(z.id);},300);
+}
+function pip(lat,lng,pts){
+  let ins=false;
+  for(let i=0,j=pts.length-1;i<pts.length;j=i++){
+    const xi=pts[i].lng,yi=pts[i].lat,xj=pts[j].lng,yj=pts[j].lat;
+    if(((yi>lat)!==(yj>lat))&&(lng<(xj-xi)*(lat-yi)/(yj-yi)+xi))ins=!ins;
+  }
+  return ins;
+}
+function nn(pts){
+  if(!pts.length)return[];const u=[...pts];const res=[];let cur=u.splice(0,1)[0];res.push(cur.id);
+  while(u.length){let bi=0,bd=Infinity;u.forEach((p,i)=>{const d=(p.lat-cur.lat)**2+(p.lng-cur.lng)**2;if(d<bd){bd=d;bi=i;}});cur=u.splice(bi,1)[0];res.push(cur.id);}
+  return res;
+}
+function clrDraw(){
+  dpMkrs.forEach(m=>map.removeLayer(m));dpLines.forEach(l=>map.removeLayer(l));
+  if(prevLine)map.removeLayer(prevLine);dpPts=[];dpMkrs=[];dpLines=[];prevLine=null;
+}
+
+// ---- House CRUD ----
+function onHouseClick(id){
+  if(mode==='draw')return;
+  editId=id;pendLL=null;
+  const h=houses.find(x=>x.id===id);if(!h)return;
+  openPop('Oppdater hus',h.addr,h.note||'',h.st,true);
+  document.getElementById('prep').value=h.rep||'';
+}
+function openPop(title,addr,note,st,showDel){
+  selSt=st;
+  document.getElementById('ptitle').textContent=title;
+  document.getElementById('pa').textContent=addr;
+  document.getElementById('pnote').value=note;
+  document.getElementById('delb').style.display=showDel?'block':'none';
+  document.querySelectorAll('.so').forEach((el,i)=>el.classList.toggle('sl',i===st));
+  if(!showDel&&curUser!=='admin')document.getElementById('prep').value=curUser;
+  document.getElementById('ov').classList.add('vis');
+}
+function setSt(i){selSt=i;document.querySelectorAll('.so').forEach((el,j)=>el.classList.toggle('sl',j===i));}
+async function saveH(){
+  const note=document.getElementById('pnote').value;
+  const rep=document.getElementById('prep').value;
+  setSyncDot('loading');
+  if(editId){
+    const h=houses.find(x=>x.id===editId);
+    if(h){
+      const upd={...h,st:selSt,note,rep:rep||h.rep};
+      const{error}=await sb.from('houses').upsert(upd);
+      if(!error&&selSt!==null){
+        await sb.from('activity').insert({id:Date.now()+'_'+Math.random(),house_id:h.id,st:selSt,rep:rep||h.rep,lat:h.lat,lng:h.lng});
+      }
+      if(error){setSyncDot('err');console.error(error);}else setSyncDot('ok');
+    }
+  } else {
+    if(!pendLL){setSyncDot('err');return;}
+    const id=Date.now();
+    const h={id,lat:pendLL.lat,lng:pendLL.lng,st:selSt,note,rep,addr:`${pendLL.lat.toFixed(4)}, ${pendLL.lng.toFixed(4)}`,ts:new Date().toISOString()};
+    const{error}=await sb.from('houses').insert(h);
+    if(!error&&selSt!==null){
+      await sb.from('activity').insert({id:id+'_a',house_id:id,st:selSt,rep,lat:h.lat,lng:h.lng});
+    }
+    if(error){setSyncDot('err');console.error(error);}else setSyncDot('ok');
+  }
+  closePop();await loadAll();
+}
+async function delH(){
+  if(!editId)return;
+  setSyncDot('loading');
+  await sb.from('houses').delete().eq('id',editId);
+  zones.forEach(async z=>{
+    if(z.route&&z.route.includes(editId)){
+      const nr=z.route.filter(x=>x!==editId);
+      await sb.from('zones').update({route:nr}).eq('id',z.id);
+    }
+  });
+  setSyncDot('ok');closePop();await loadAll();
+}
+function closePop(){document.getElementById('ov').classList.remove('vis');editId=null;pendLL=null;selSt=null;}
+
+// ---- Zone CRUD ----
+function openZPop(zid){
+  editZoneId=zid;
+  const z=zones.find(x=>x.id===zid);if(!z)return;
+  document.getElementById('ztitle').innerHTML=`<span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:${z.color};margin-right:6px;vertical-align:middle"></span>${z.name||'Sone'} – ${(z.route||[]).length} hus`;
+  document.getElementById('zname').value=z.name||'';
+  document.getElementById('zmeta').textContent=`Opprettet: ${z.created}`;
+  const reps=z.reps||[];
+  document.getElementById('zrep-grid').innerHTML=REPS.map(r=>`<label class="rep-check${reps.includes(r)?' sel':''}" onclick="this.classList.toggle('sel')">
+    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${RCOL[r]};flex-shrink:0"></span>
+    <span>${r}</span></label>`).join('');
+  document.getElementById('zov').classList.add('vis');
+}
+async function saveZone(){
+  const z=zones.find(x=>x.id===editZoneId);if(!z)return;
+  const reps=[...document.querySelectorAll('#zrep-grid .rep-check.sel')].map(el=>el.querySelector('span:last-child').textContent);
+  const name=document.getElementById('zname').value;
+  setSyncDot('loading');
+  const{error}=await sb.from('zones').update({name,reps}).eq('id',editZoneId);
+  if(error){setSyncDot('err');}else setSyncDot('ok');
+  closeZPop();await loadAll();
+}
+async function deleteZone(){
+  setSyncDot('loading');
+  await sb.from('zones').delete().eq('id',editZoneId);
+  setSyncDot('ok');closeZPop();await loadAll();
+}
+function closeZPop(){document.getElementById('zov').classList.remove('vis');editZoneId=null;}
+
+// ---- Render panel ----
+function renderPanel(){
+  const el=document.getElementById('rp-body');
+  if(rpTab==='stats')el.innerHTML=renderStats();
+  else if(rpTab==='soner')el.innerHTML=renderZoneList();
+  else el.innerHTML=renderHouseList();
+}
+
+function renderStats(){
+  const PLABELS={24:'24t','7d':'7d','31d':'31d',month:'Mnd',avg:'Snitt'};
+  let html=`<div class="pt-row">${['24h','7d','31d','month','avg'].map((p,i)=>`<button class="pt${p===msPer?' on':''}" onclick="setPeriod('${p}')">${['24t','7d','31d','Mnd','Snitt'][i]}</button>`).join('')}</div>`;
+  const rep=curUser==='admin'?null:curUser;
+  const s=getStats(msPer,rep);
+  html+=`<div class="sec-title">${rep||'Total statistikk'}${msPer==='avg'?' – dagsnitt':''}</div>`;
+  html+=`<div class="sc-grid">
+    <div class="sc" style="border-color:#64748b"><div class="sc-val">${s.total}</div><div class="sc-lbl">Totalt</div></div>
+    <div class="sc" style="border-color:${SCOL[3]}"><div class="sc-val" style="color:${SCOL[3]}">${s.counts[3]}</div><div class="sc-lbl">Nye kunder</div><div class="sc-sub">${s.rate}% konv.</div></div>
+    <div class="sc" style="border-color:${SCOL[0]}"><div class="sc-val" style="color:${SCOL[0]}">${s.counts[0]}</div><div class="sc-lbl">Ikke hjemme</div></div>
+    <div class="sc" style="border-color:${SCOL[1]}"><div class="sc-val" style="color:${SCOL[1]}">${s.counts[1]}</div><div class="sc-lbl">Allerede kunde</div></div>
+    <div class="sc" style="border-color:${SCOL[2]}"><div class="sc-val" style="color:${SCOL[2]}">${s.counts[2]}</div><div class="sc-lbl">Ikke interessert</div></div>
+    <div class="sc" style="border-color:#6366f1"><div class="sc-val" style="color:#6366f1">${s.rate}%</div><div class="sc-lbl">Konvertering</div></div>
+  </div>`;
+  if(curUser==='admin'){
+    html+=`<div class="divider"></div><div class="sec-title">Per selger</div>`;
+    html+=REPS.map(r=>{
+      const rs=getStats(msPer,r);
+      if(!rs.total&&msPer!=='avg')return'';
+      const tot=Math.max(rs.total,1);
+      return `<div class="srep" onclick="document.getElementById('usel').value='${r}';onUserChange()">
+        <div class="srep-hdr">
+          <div style="width:9px;height:9px;border-radius:50%;background:${RCOL[r]}"></div>
+          <span style="font-size:12px;font-weight:600">${r}</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--mu)">${rs.total} banker</span>
+          <span style="margin-left:6px;font-size:11px;font-weight:700;color:${SCOL[3]}">${rs.rate}%</span>
+        </div>
+        <div class="srep-mini">
+          <span style="color:${SCOL[3]}">● ${rs.counts[3]} kunder</span>
+          <span style="color:${SCOL[0]}">● ${rs.counts[0]} borte</span>
+          <span style="color:${SCOL[2]}">● ${rs.counts[2]} nei</span>
+        </div>
+        <div class="srep-bar-wrap" style="margin-top:5px">
+          ${[3,0,1,2].map(i=>`<div class="srep-bar" style="width:${Math.round(rs.counts[i]/tot*100)}%;background:${SCOL[i]}"></div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+    if(curUser!=='admin'){
+      const mz=zones.filter(z=>(z.reps||[]).includes(curUser));
+      if(mz.length){html+=`<div class="divider"></div><div class="sec-title">Mine soner</div>`;html+=mz.map(z=>`<div class="zc" style="background:${z.color}11;border-color:${z.color}33" onclick="openZPop(${z.id})"><div class="zc-hdr"><div class="zc-dot" style="background:${z.color}"></div><span style="font-size:12px;font-weight:600">${z.name||'Sone'}</span><span style="margin-left:auto;font-size:11px;color:var(--mu)">${(z.route||[]).length} hus</span></div></div>`).join('');}
+    }
+  }
+  return html;
+}
+
+function renderZoneList(){
+  if(!zones.length)return`<div class="empty"><div class="draw-tip">Trykk <b>⬡ Tegn sone</b> og tegn et polygon rundt husene.</div></div>`;
+  return zones.map(z=>{
+    const repBadges=(z.reps||[]).map(r=>`<span style="background:${RCOL[r]||'#555'}22;color:${RCOL[r]||'#aaa'};padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500">${r}</span>`).join(' ');
+    const houseRows=(z.route||[]).slice(0,4).map((id,i)=>{
+      const h=houses.find(x=>x.id===id);if(!h)return'';
+      const b=h.st!==null?`<span class="badge b${h.st}" style="font-size:9px">${STA[h.st]}</span>`:'';
+      return `<div style="display:flex;align-items:center;gap:4px;padding:2px 0;font-size:10px;color:var(--mu)"><span class="rnum" style="background:${z.color}">${i+1}</span><span>${h.addr}</span>${b}</div>`;
+    }).join('');
+    const more=(z.route||[]).length>4?`<div style="font-size:10px;color:var(--mu);padding:2px 4px">+${z.route.length-4} til…</div>`:'';
+    return `<div class="zc" style="background:${z.color}11;border-color:${z.color}33" onclick="openZPop(${z.id})">
+      <div class="zc-hdr"><div class="zc-dot" style="background:${z.color}"></div>
+        <span style="font-size:12px;font-weight:600">${z.name||'Sone'}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--mu)">${(z.route||[]).length} hus</span>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px">${repBadges||'<span style="font-size:10px;color:var(--mu)">Ingen tildelt</span>'}</div>
+      <div style="font-size:10px;color:var(--mu);margin-bottom:5px">${z.created}</div>
+      ${houseRows}${more}
+    </div>`;
+  }).join('');
+}
+
+function renderHouseList(){
+  const list=curUser==='admin'?houses:houses.filter(h=>h.rep===curUser);
+  if(!list.length)return`<div class="empty">Ingen hus registrert ennå</div>`;
+  return list.slice().reverse().slice(0,100).map(h=>{
+    const b=h.st===null?'<span class="badge bn">Ukjent</span>':`<span class="badge b${h.st}">${STA[h.st]}</span>`;
+    const rb=h.rep?`<span style="background:${RCOL[h.rep]||'#555'}22;color:${RCOL[h.rep]||'#aaa'};padding:2px 5px;border-radius:4px;font-size:10px">${h.rep}</span>`:'';
+    return `<div class="hi" onclick="onHouseClick(${h.id})"><div class="ha">${h.addr}</div>
+      <div class="hm">${b}${rb}</div>
+      ${h.note?`<div style="font-size:10px;color:var(--mu);margin-top:2px">${h.note}</div>`:''}</div>`;
+  }).join('');
+}
+
+// ---- Map overlay stats ----
+function setMsPer(p){
+  msPer=p;
+  document.querySelectorAll('.msp').forEach((el,i)=>el.classList.toggle('on',['24h','7d','31d','month','avg'][i]===p));
+  renderMapStats();renderPanel();
+}
+function setPeriod(p){msPer=p;renderPanel();renderMapStats();}
+function renderMapStats(){
+  if(!mapOnly||curUser!=='admin')return;
+  const s=getStats(msPer,null);
+  document.getElementById('ms-grid').innerHTML=`
+    <div class="ms-cell"><div class="ms-val">${s.total}</div><div class="ms-lbl">Banker</div></div>
+    <div class="ms-cell"><div class="ms-val" style="color:${SCOL[3]}">${s.counts[3]}</div><div class="ms-lbl">Kunder</div></div>
+    <div class="ms-cell"><div class="ms-val" style="color:${SCOL[3]}">${s.rate}%</div><div class="ms-lbl">Konv.</div></div>
+    <div class="ms-cell"><div class="ms-val" style="color:${SCOL[0]}">${s.counts[0]}</div><div class="ms-lbl">Borte</div></div>
+    <div class="ms-cell"><div class="ms-val" style="color:${SCOL[2]}">${s.counts[2]}</div><div class="ms-lbl">Nei</div></div>
+    <div class="ms-cell"><div class="ms-val" style="color:${SCOL[1]}">${s.counts[1]}</div><div class="ms-lbl">Allerede</div></div>`;
+  document.getElementById('ms-reps').innerHTML=`<div style="font-size:10px;color:var(--mu);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;border-top:1px solid var(--bo);padding-top:8px">Per selger</div>`+
+    REPS.map(r=>{const rs=getStats(msPer,r);if(!rs.total&&msPer!=='avg')return'';
+      return `<div class="ms-rep-row"><div class="ms-rep-dot" style="background:${RCOL[r]}"></div><span style="flex:1">${r}</span><span style="color:var(--mu)">${rs.total}</span><span style="color:${SCOL[3]};margin-left:8px;font-weight:700">${rs.rate}%</span></div>`;
+    }).join('');
+}
+
+// ---- Init ----
+setMode('pin');
+loadAll();
+setupRealtime();
+</script>
+</body>
+</html>
