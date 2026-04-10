@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Trive Canvas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--acc:#01ce68;--acc2:#00a854;--bg:#f8fafc;--white:#fff;--border:#e2e8f0;--text:#1e293b;--mu:#64748b;--ra:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Login */
+#login-screen{position:fixed;inset:0;background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;z-index:9999}
+#login-screen img{width:80px;margin-bottom:8px}
+#login-screen h2{font-size:22px;font-weight:700;margin-bottom:4px}
+#login-screen p{font-size:13px;color:var(--mu);margin-bottom:28px}
+.inp{width:100%;border:1.5px solid var(--border);border-radius:var(--ra);padding:13px 14px;font-size:15px;margin-bottom:12px;color:var(--text);background:var(--white)}
+.inp:focus{outline:none;border-color:var(--acc)}
+.btn-login{width:100%;background:var(--acc);color:#fff;border:none;border-radius:var(--ra);padding:15px;font-size:16px;font-weight:600;cursor:pointer}
+.btn-login:active{background:var(--acc2)}
+#login-err{color:#dc2626;font-size:13px;margin-top:8px;text-align:center;display:none}
+
+/* Top bar */
+#topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;safe-area-inset-top:env(safe-area-inset-top)}
+#topbar .logo{font-size:16px;font-weight:700;color:var(--acc)}
+#topbar .rep-name{font-size:13px;color:var(--mu);flex:1}
+#sync-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8}
+#sync-dot.ok{background:var(--acc)}
+#sync-dot.err{background:#dc2626}
+#sync-dot.syn{background:#d97706;animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.logout-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--mu)}
+
+/* Views */
+#map-view{flex:1;position:relative;display:flex;flex-direction:column}
+#map{flex:1}
+#dash-view{flex:1;overflow-y:auto;display:none;padding:16px}
+
+/* Bottom nav */
+#bnav{background:var(--white);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);flex-shrink:0}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:3px;cursor:pointer;border:none;background:none;color:var(--mu);font-size:10px}
+.bnav-btn.on{color:var(--acc)}
+.bnav-btn svg{width:22px;height:22px}
+
+/* FAB - marker hus */
+#fab{position:absolute;bottom:80px;right:20px;width:60px;height:60px;border-radius:50%;background:var(--acc);border:none;color:#fff;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(1,206,104,.4);display:flex;align-items:center;justify-content:center;z-index:500;transition:transform .1s}
+#fab:active{transform:scale(.93)}
+
+/* House popup (bottom sheet) */
+#hpop{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-radius:20px 20px 0 0;padding:20px 20px 32px;box-shadow:0 -4px 24px rgba(0,0,0,.15);z-index:600;transform:translateY(100%);transition:transform .25s ease;max-height:85dvh;overflow-y:auto}
+#hpop.open{transform:translateY(0)}
+#hpop-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+#hpop h3{font-size:16px;font-weight:700;margin-bottom:4px}
+#hpop-addr{font-size:12px;color:var(--mu);margin-bottom:16px}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.st-btn{padding:14px 8px;border-radius:12px;border:2px solid transparent;text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:border .1s}
+.st-btn.s0{background:#fffbeb;color:#78350f}.st-btn.s0.sel,.st-btn.s0:active{border-color:#d97706}
+.st-btn.s1{background:#eff6ff;color:#1e3a8a}.st-btn.s1.sel,.st-btn.s1:active{border-color:#2563eb}
+.st-btn.s2{background:#fef2f2;color:#7f1d1d}.st-btn.s2.sel,.st-btn.s2:active{border-color:#dc2626}
+.st-btn.s3{background:#f0fdf4;color:#14532d}.st-btn.s3.sel,.st-btn.s3:active{border-color:#16a34a}
+.note-inp{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;margin-bottom:14px;resize:none;height:70px;color:var(--text)}
+.note-inp:focus{outline:none;border-color:var(--acc)}
+.save-btn{width:100%;background:var(--acc);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:600;cursor:pointer}
+.save-btn:active{background:var(--acc2)}
+.cancel-link{display:block;text-align:center;margin-top:12px;color:var(--mu);font-size:14px;cursor:pointer}
+
+/* Dashboard */
+.dash-section{background:var(--white);border-radius:var(--ra);padding:14px;margin-bottom:12px;border:1px solid var(--border)}
+.dash-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
+.kpi{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.kpi-val{font-size:22px;font-weight:700}
+.kpi-lbl{font-size:10px;color:var(--mu);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.lb-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen">
+  <img src="trive-logo-check-green_5x.png" onerror="this.style.display='none'">
+  <h2>Trive Canvas</h2>
+  <p>Logg inn for å starte</p>
+  <input class="inp" id="l-email" type="email" placeholder="E-post" autocomplete="email">
+  <input class="inp" id="l-pass" type="password" placeholder="Passord">
+  <button class="btn-login" onclick="doLogin()">Logg inn</button>
+  <div id="login-err">Feil e-post eller passord</div>
+</div>
+
+<!-- App -->
+<div id="topbar" style="display:none">
+  <div class="logo">trive</div>
+  <div class="rep-name" id="rep-label"></div>
+  <div id="sync-dot"></div>
+  <button class="logout-btn" onclick="doLogout()">Logg ut</button>
+</div>
+
+<div id="map-view" style="display:none">
+  <div id="map"></div>
+  <button id="fab" onclick="openHPop()">＋</button>
+  <div id="hpop">
+    <div id="hpop-handle"></div>
+    <h3 id="hpop-title">Marker hus</h3>
+    <div id="hpop-addr"></div>
+    <div class="st-grid">
+      <div class="st-btn s0" onclick="selSt(0)">🏠 Ikke hjemme</div>
+      <div class="st-btn s1" onclick="selSt(1)">✅ Allerede kunde</div>
+      <div class="st-btn s2" onclick="selSt(2)">❌ Ikke interessert</div>
+      <div class="st-btn s3" onclick="selSt(3)">🎉 Ble kunde!</div>
+    </div>
+    <textarea class="note-inp" id="hpop-note" placeholder="Notat (valgfritt)…"></textarea>
+    <button class="save-btn" onclick="saveHouse()">Lagre</button>
+    <span class="cancel-link" onclick="closeHPop()">Avbryt</span>
+  </div>
+</div>
+
+<div id="dash-view">
+  <div class="dash-section">
+    <div class="dash-title" id="dash-greeting">I dag</div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val" id="kpi-knock">0</div><div class="kpi-lbl">Dører</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpi-dem" style="color:#16a34a">0</div><div class="kpi-lbl">Demands</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpi-rate" style="color:#01ce68">0%</div><div class="kpi-lbl">Konv.</div></div>
+    </div>
+  </div>
+  <div class="dash-section">
+    <div class="dash-title">Leaderboard i dag 🏆</div>
+    <div id="lb-list"></div>
+  </div>
+</div>
+
+<div id="bnav" style="display:none">
+  <button class="bnav-btn on" id="bnav-map" onclick="showView('map')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7z"/><path d="M9 4v13M15 7v13"/></svg>
+    Kart
+  </button>
+  <button class="bnav-btn" id="bnav-dash" onclick="showView('dash')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </button>
+</div>
+
+<script>
+const SURL='https://hfngvxguweydbsvyvmnd.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhmbmd2eGd1d2V5ZGJzdnl2bW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NzY2NDIsImV4cCI6MjA5MTM1MjY0Mn0.iHJq-NfHtEKQX3dO3dP7_kQM1zSM0lHs7BVVMtHRoJY';
+const sb=supabase.createClient(SURL,SKEY);
+
+const RCOL={Mats:'#6366f1',Emma:'#0891b2',Jonas:'#16a34a',Sara:'#ea580c',Lars:'#db2777',Ida:'#0d9488',Erik:'#d97706',Nora:'#84cc16',Håkon:'#8b5cf6',Lena:'#dc2626'};
+const STA=['Ikke hjemme','Allerede kunde','Ikke interessert','Ble kunde'];
+const SCOL=['#d97706','#2563eb','#dc2626','#16a34a'];
+
+let curRep=null,curSt=null,gpsLL=null,map=null;
+let houses=[],zones=[],activity=[];
+let mkrs={},zoneLyrs={};
+let gpsWatch=null;
+
+function setSd(s){document.getElementById('sync-dot').className=s;}
+
+// ---- Login ----
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  if(!email||!pass)return;
+  setSd('syn');
+  const{data,error}=await sb.from('rep_users').select('*').eq('email',email).eq('password',pass).single();
+  if(error||!data){setSd('err');document.getElementById('login-err').style.display='block';return;}
+  curRep=data.rep;
+  localStorage.setItem('trive_rep',curRep);
+  localStorage.setItem('trive_email',email);
+  showApp();
+}
+
+function doLogout(){
+  localStorage.removeItem('trive_rep');localStorage.removeItem('trive_email');
+  curRep=null;location.reload();
+}
+
+function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('bnav').style.display='flex';
+  document.getElementById('rep-label').textContent=curRep;
+  showView('map');
+  loadData();
+  setupRealtime();
+  startGPS();
+}
+
+// ---- GPS ----
+function startGPS(){
+  if(!navigator.geolocation)return;
+  gpsWatch=navigator.geolocation.watchPosition(pos=>{
+    gpsLL={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    sb.from('locations').upsert({id:curRep,rep:curRep,lat:gpsLL.lat,lng:gpsLL.lng,ts:new Date().toISOString()});
+  },{enableHighAccuracy:true,maximumAge:15000});
+}
+
+// ---- Load data ----
+async function loadData(){
+  setSd('syn');
+  const[hR,zR,aR]=await Promise.all([
+    sb.from('houses').select('*'),
+    sb.from('zones').select('*'),
+    sb.from('activity').select('*').order('ts',{ascending:false}).limit(2000)
+  ]);
+  houses=hR.data||[];
+  zones=(zR.data||[]).map(z=>({...z,pts:z.pts||[],reps:z.reps||[],route:z.route||[]}));
+  activity=aR.data||[];
+  setSd('ok');
+  renderMap();renderDash();
+}
+
+function setupRealtime(){
+  sb.channel('selger').on('postgres_changes',{event:'*',schema:'public',table:'activity'},loadData)
+    .on('postgres_changes',{event:'*',schema:'public',table:'houses'},loadData).subscribe();
+}
+
+// ---- Map ----
+function renderMap(){
+  if(!map){
+    map=L.map('map',{zoomControl:false}).setView([59.9139,10.7522],15);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OSM © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+    L.control.zoom({position:'topright'}).addTo(map);
+  }
+  // Clear
+  Object.values(mkrs).forEach(m=>map.removeLayer(m));mkrs={};
+  Object.values(zoneLyrs).forEach(l=>map.removeLayer(l));zoneLyrs={};
+
+  // My zones only
+  const myZones=zones.filter(z=>(z.reps||[]).includes(curRep));
+  myZones.forEach(z=>{
+    if(!z.pts?.length)return;
+    const lyr=L.polygon(z.pts.map(p=>[p.lat,p.lng]),{color:z.color,fillColor:z.color,fillOpacity:.1,weight:2}).addTo(map);
+    // Zone label
+    const center=lyr.getBounds().getCenter();
+    if(z.name){L.marker(center,{icon:L.divIcon({className:'',html:`<div style="background:${z.color};color:#fff;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap">${z.name}</div>`,iconAnchor:[40,10]})}).addTo(map);}
+    zoneLyrs[z.id]=lyr;
+  });
+
+  // Houses in my zones
+  const myHouseIds=new Set(myZones.flatMap(z=>z.route||[]));
+  houses.filter(h=>myHouseIds.has(h.id)||h.rep===curRep).forEach(h=>{
+    const c=h.st===null?'#94a3b8':SCOL[h.st];
+    const m=L.circleMarker([h.lat,h.lng],{radius:8,color:'#fff',fillColor:c,fillOpacity:1,weight:2}).addTo(map);
+    m.on('click',()=>openHPopExisting(h.id));
+    mkrs[h.id]=m;
+  });
+
+  // Fit to my zones if any
+  if(myZones.length&&Object.keys(zoneLyrs).length){
+    try{map.fitBounds(L.featureGroup(Object.values(zoneLyrs)).getBounds(),{padding:[20,20]});}catch(e){}
+  } else if(gpsLL){map.setView([gpsLL.lat,gpsLL.lng],16);}
+}
+
+// ---- House popup ----
+let editHouseId=null;
+function openHPop(){
+  editHouseId=null;curSt=null;
+  document.getElementById('hpop-title').textContent='Marker hus';
+  const addr=gpsLL?`${gpsLL.lat.toFixed(5)}, ${gpsLL.lng.toFixed(5)}`:'Ukjent posisjon';
+  document.getElementById('hpop-addr').textContent=addr;
+  document.getElementById('hpop-note').value='';
+  document.querySelectorAll('.st-btn').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('hpop').classList.add('open');
+}
+function openHPopExisting(id){
+  editHouseId=id;
+  const h=houses.find(x=>x.id===id);if(!h)return;
+  document.getElementById('hpop-title').textContent='Oppdater hus';
+  document.getElementById('hpop-addr').textContent=h.addr;
+  document.getElementById('hpop-note').value=h.note||'';
+  curSt=h.st;
+  document.querySelectorAll('.st-btn').forEach((el,i)=>el.classList.toggle('sel',i===h.st));
+  document.getElementById('hpop').classList.add('open');
+}
+function closeHPop(){document.getElementById('hpop').classList.remove('open');}
+function selSt(i){curSt=i;document.querySelectorAll('.st-btn').forEach((el,j)=>el.classList.toggle('sel',j===i));}
+
+async function saveHouse(){
+  setSd('syn');
+  const note=document.getElementById('hpop-note').value;
+  if(editHouseId){
+    const h=houses.find(x=>x.id===editHouseId);
+    if(h){
+      await sb.from('houses').upsert({...h,st:curSt,note,rep:curRep});
+      if(curSt!==null)await sb.from('activity').insert({id:Date.now()+'_'+Math.random(),house_id:h.id,st:curSt,rep:curRep,lat:h.lat,lng:h.lng});
+    }
+  } else {
+    if(!gpsLL){alert('Venter på GPS…');return;}
+    const id=Date.now();
+    const h={id,lat:gpsLL.lat,lng:gpsLL.lng,st:curSt,note,rep:curRep,addr:`${gpsLL.lat.toFixed(4)}, ${gpsLL.lng.toFixed(4)}`,ts:new Date().toISOString()};
+    await sb.from('houses').insert(h);
+    if(curSt!==null)await sb.from('activity').insert({id:id+'_a',house_id:id,st:curSt,rep:curRep,lat:h.lat,lng:h.lng});
+  }
+  setSd('ok');closeHPop();await loadData();
+}
+
+// ---- Dashboard ----
+function renderDash(){
+  const start=new Date();start.setHours(0,0,0,0);
+  const myToday=activity.filter(a=>a.rep===curRep&&new Date(a.ts)>=start);
+  const total=myToday.length;
+  const demands=myToday.filter(a=>a.st===3).length;
+  const rate=total>0?Math.round(demands/total*100):0;
+  document.getElementById('kpi-knock').textContent=total;
+  document.getElementById('kpi-dem').textContent=demands;
+  document.getElementById('kpi-rate').textContent=rate+'%';
+  document.getElementById('dash-greeting').textContent=`Hei ${curRep}! I dag`;
+
+  // Leaderboard
+  const REPS=Object.keys(RCOL);
+  const rows=REPS.map(r=>{
+    const acts=activity.filter(a=>a.rep===r&&new Date(a.ts)>=start);
+    return{r,total:acts.length,demands:acts.filter(a=>a.st===3).length};
+  }).sort((a,b)=>b.demands-a.demands);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lb-list').innerHTML=rows.map((x,i)=>`
+    <div class="lb-row" style="${x.r===curRep?'background:#e8fef3;border-radius:8px;padding:8px 6px;margin:-2px -4px':''}">
+      <span style="font-size:15px;min-width:22px">${medals[i]||i+1}</span>
+      <div class="lb-av" style="background:${RCOL[x.r]||'#666'}">${x.r[0]}</div>
+      <span style="flex:1;font-weight:${x.r===curRep?700:400}">${x.r}${x.r===curRep?' (deg)':''}</span>
+      <span style="color:#16a34a;font-weight:600">${x.demands}</span>
+      <span style="color:#94a3b8;font-size:12px;margin-left:6px">${x.total} dører</span>
+    </div>`).join('');
+}
+
+function showView(v){
+  document.getElementById('map-view').style.display=v==='map'?'flex':'none';
+  document.getElementById('dash-view').style.display=v==='dash'?'block':'none';
+  document.getElementById('bnav-map').className='bnav-btn'+(v==='map'?' on':'');
+  document.getElementById('bnav-dash').className='bnav-btn'+(v==='dash'?' on':'');
+  if(v==='map'&&map)setTimeout(()=>map.invalidateSize(),100);
+  if(v==='dash')renderDash();
+}
+
+// Auto-login if session saved
+window.onload=()=>{
+  const rep=localStorage.getItem('trive_rep');
+  if(rep){curRep=rep;showApp();}
+};
+</script>
+</body>
+</html>
