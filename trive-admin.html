@@ -270,7 +270,7 @@ textarea.nt:focus{outline:none;border-color:var(--accent)}
         <div id="ms-reps"></div>
       </div>
       <!-- Dashboard panel (non-map views) -->
-      <div id="dash-panel" style="display:none;position:absolute;inset:0;background:var(--gray);overflow-y:auto;padding:20px;z-index:2">
+      <div id="dash-panel" style="display:none;position:absolute;inset:0;background:var(--gray);overflow-y:auto;padding:20px;z-index:1000">
         <div id="dash-content"></div>
       </div>
     </div>
@@ -570,14 +570,22 @@ function swNav(v){
   });
   const dash=document.getElementById('dash-panel');
   const rpEl=document.getElementById('rp');
+  const mapArea=document.getElementById('map');
   if(v==='map'){
-    dash.style.display='none';rpEl.style.display='flex';
+    dash.style.display='none';
+    mapArea.style.display='block';
+    rpEl.style.display='flex';
     renderPanel();renderMapStats();
+    setTimeout(()=>map.invalidateSize(),100);
   } else if(v==='agentmap'){
-    dash.style.display='none';rpEl.style.display='none';
+    mapArea.style.display='none';
+    dash.style.cssText='display:block;position:absolute;inset:0;background:var(--gray);overflow:hidden;z-index:1000;padding:0';
+    rpEl.style.display='none';
     initAgentMap();
   } else {
-    dash.style.display='block';rpEl.style.display='none';
+    mapArea.style.display='none';
+    dash.style.cssText='display:block;position:absolute;inset:0;background:var(--gray);overflow-y:auto;padding:20px;z-index:1000';
+    rpEl.style.display='none';
     renderDash();
   }
 }
@@ -645,10 +653,12 @@ function swRp(t){
 }
 
 // Draw
+let isFinishing=false;
 function addDPt(ll){
+  if(isFinishing)return;
   dpPts.push(ll);
-  const dm=L.circleMarker([ll.lat,ll.lng],{radius:5,color:'#fff',fillColor:'#01ce68',fillOpacity:1,weight:2}).addTo(map);
-  if(dpPts.length===1){dm.on('click',e=>{L.DomEvent.stop(e);if(dpPts.length>=3)finishDraw();});dm.bindTooltip('Lukk her',{permanent:false});}
+  const dm=L.circleMarker([ll.lat,ll.lng],{radius:8,color:'#fff',fillColor:'#01ce68',fillOpacity:1,weight:2}).addTo(map);
+  if(dpPts.length===1){dm.on('click',e=>{L.DomEvent.stopPropagation(e);L.DomEvent.preventDefault(e);if(dpPts.length>=3){isFinishing=true;finishDraw();}});dm.bindTooltip('Lukk her',{permanent:true,direction:'right'});}
   dpMkrs.push(dm);
   if(dpPts.length>1){const pv=dpPts[dpPts.length-2];dpLines.push(L.polyline([[pv.lat,pv.lng],[ll.lat,ll.lng]],{color:'#01ce68',weight:2.5,opacity:.8}).addTo(map));}
   setHint(dpPts.length<3?`${dpPts.length} punkt`:`${dpPts.length} punkt – klikk startpunktet for å lukke`);
@@ -662,7 +672,7 @@ async function finishDraw(){
   setSyncDot('syn');
   const{error}=await sb.from('zones').upsert(nz);
   if(error){setSyncDot('err','Feil');return;}
-  setSyncDot('ok');setHint('✓ Sone opprettet med '+inside.length+' hus');setMode('view');
+  setSyncDot('ok');setHint('✓ Sone opprettet med '+inside.length+' hus');setMode('view');isFinishing=false;
   await loadAll();setTimeout(()=>{const z=zones.find(x=>x.id===nz.id);if(z)openZPop(z.id);},300);
 }
 function pip(lat,lng,pts){
@@ -676,7 +686,7 @@ function nn(pts){
   if(!pts.length)return[];const u=[...pts];const res=[];let cur=u.splice(0,1)[0];res.push(cur.id);
   while(u.length){let bi=0,bd=Infinity;u.forEach((p,i)=>{const d=(p.lat-cur.lat)**2+(p.lng-cur.lng)**2;if(d<bd){bd=d;bi=i;}});cur=u.splice(bi,1)[0];res.push(cur.id);}return res;
 }
-function clrDraw(){dpMkrs.forEach(m=>map.removeLayer(m));dpLines.forEach(l=>map.removeLayer(l));if(prevLine)map.removeLayer(prevLine);dpPts=[];dpMkrs=[];dpLines=[];prevLine=null;}
+function clrDraw(){dpMkrs.forEach(m=>map.removeLayer(m));dpLines.forEach(l=>map.removeLayer(l));if(prevLine)map.removeLayer(prevLine);dpPts=[];dpMkrs=[];dpLines=[];prevLine=null;isFinishing=false;}
 
 // House CRUD
 function onHouseClick(id){
@@ -1099,7 +1109,6 @@ function initAgentMap(){
   body.appendChild(mapDiv);body.appendChild(panel);
   wrap.appendChild(toolbar);wrap.appendChild(body);
   dc.appendChild(wrap);
-  document.getElementById('dash-panel').style.display='block';
   if(!agentMapInst){
     agentMapInst=L.map('agent-map').setView([59.9139,10.7522],14);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OSM © CARTO',subdomains:'abcd',maxZoom:19}).addTo(agentMapInst);
