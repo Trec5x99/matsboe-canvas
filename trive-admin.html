@@ -239,9 +239,9 @@ textarea.nt:focus{outline:none;border-color:var(--accent)}
 <div id="main">
   <div id="topbar">
     <h2 id="page-title">Kart</h2>
-    <button class="tb-btn active" id="bpin" onclick="setMode('pin')">＋ Marker hus</button>
+    <button class="tb-btn on" id="bpin" onclick="setMode('pin')">＋ Marker hus</button>
     <button class="tb-btn draw" id="bdraw" onclick="setMode('draw')">⬡ Tegn sone</button>
-    <button class="tb-btn" id="bheat" onclick="toggleHeat()">🔥 Varmekart</button>
+    <button class="tb-btn" id="bmove" onclick="setMode('move')">✥ Flytt</button>
     <span id="ht" style="display:none"></span>
     <div class="tb-r">
       <button class="tb-btn" onclick="exportCSV()">↓ CSV</button>
@@ -505,7 +505,7 @@ function renderMap(){
   visibleZones.forEach(z=>{
     if(!z.pts||!z.pts.length)return;
     const lyr=L.polygon(z.pts.map(p=>[p.lat,p.lng]),{color:z.color,fillColor:z.color,fillOpacity:.08,weight:2}).addTo(map);
-    lyr.on('click',e=>{L.DomEvent.stop(e);if(mode==='view'||mode==='draw')openZPop(z.id);});
+    lyr.on('click',e=>{if(mode==='view'||mode==='draw'){L.DomEvent.stop(e);openZPop(z.id);}});
     // Status label on zone
     const center=lyr.getBounds().getCenter();
     const icon={none:'',active:'▶ ',done:'✓ '}[z.status||'none'];
@@ -608,19 +608,36 @@ map.on('click',e=>{
   if(mode==='pin'){pendLL=e.latlng;editId=null;selSt=null;openPop('Nytt hus',`${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`,'',null,false);}
   else if(mode==='draw'){addDPt(e.latlng);}
 });
+let proxTooltip=null;
 map.on('mousemove',e=>{
   if(mode==='draw'&&dpPts.length>0){
     if(prevLine)map.removeLayer(prevLine);
     prevLine=L.polyline([[dpPts[dpPts.length-1].lat,dpPts[dpPts.length-1].lng],[e.latlng.lat,e.latlng.lng]],{color:'#01ce68',weight:2,dashArray:'5,4',opacity:.6}).addTo(map);
+    if(dpPts.length>=3){
+      const p1=map.latLngToContainerPoint(e.latlng);
+      const p2=map.latLngToContainerPoint(L.latLng(dpPts[0].lat,dpPts[0].lng));
+      const near=Math.sqrt((p1.x-p2.x)**2+(p1.y-p2.y)**2)<35;
+      if(near&&!proxTooltip){
+        proxTooltip=L.marker(dpPts[0],{icon:L.divIcon({className:'',
+          html:`<button onclick="isFinishing=true;finishDraw()" style="background:#01ce68;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);white-space:nowrap">✓ Klikk for å fullføre sonen</button>`,
+          iconAnchor:[0,40]})}).addTo(map);
+      } else if(!near&&proxTooltip){map.removeLayer(proxTooltip);proxTooltip=null;}
+    }
   }
 });
 function setMode(m){
-  mode=m;if(m!=='draw')clrDraw();
+  mode=m;
+  if(m!=='draw'){clrDraw();if(proxTooltip){map.removeLayer(proxTooltip);proxTooltip=null;}}
   document.getElementById('bpin').className='tb-btn'+(m==='pin'?' active':'');
   document.getElementById('bdraw').className='tb-btn draw'+(m==='draw'?' on':'');
-  map.getContainer().style.cursor=(m==='pin'||m==='draw')?'crosshair':'';
-  if(m==='draw')setHint('Klikk for å tegne sone – klikk startpunkt for å lukke');
+  const bmove=document.getElementById('bmove');if(bmove)bmove.className='tb-btn'+(m==='move'?' active':'');
+  // Enable/disable map dragging
+  if(m==='move'){map.dragging.enable();map.getContainer().style.cursor='grab';}
+  else if(m==='pin'||m==='draw'){map.dragging.enable();map.getContainer().style.cursor='crosshair';}
+  else{map.dragging.enable();map.getContainer().style.cursor='';}
+  if(m==='draw')setHint('Klikk på kartet for å tegne sone');
   else if(m==='pin')setHint('Klikk på kartet for å markere hus');
+  else if(m==='move')setHint('Dra kartet for å flytte');
   else setHint('');
 }
 function setHint(t){const el=document.getElementById('ht');el.textContent=t;el.style.display=t?'inline':'none';}
@@ -657,19 +674,12 @@ function swRp(t){
 let isFinishing=false;
 function addDPt(ll){
   if(isFinishing)return;
-  // Proximity check: if within 20px of start point and have 3+ pts, close polygon
-  if(dpPts.length>=3){
-    const p1=map.latLngToContainerPoint(ll);
-    const p2=map.latLngToContainerPoint(L.latLng(dpPts[0].lat,dpPts[0].lng));
-    if(Math.sqrt((p1.x-p2.x)**2+(p1.y-p2.y)**2)<22){isFinishing=true;finishDraw();return;}
-  }
   dpPts.push(ll);
   const isFirst=dpPts.length===1;
   const dm=L.circleMarker([ll.lat,ll.lng],{radius:isFirst?9:6,color:'#fff',fillColor:'#01ce68',fillOpacity:1,weight:2}).addTo(map);
-  if(isFirst){dm.bindTooltip('Klikk nær her for å lukke',{permanent:true,direction:'right',offset:[12,0]});}
   dpMkrs.push(dm);
   if(dpPts.length>1){const pv=dpPts[dpPts.length-2];dpLines.push(L.polyline([[pv.lat,pv.lng],[ll.lat,ll.lng]],{color:'#01ce68',weight:2.5,opacity:.8}).addTo(map));}
-  setHint(dpPts.length<3?`${dpPts.length} punkt tegnet`:`${dpPts.length} punkt – klikk nær startpunktet for å lukke`);
+  setHint(dpPts.length<3?`${dpPts.length} punkt tegnet`:`${dpPts.length} punkt – beveg musen mot startpunktet for å fullføre`);
 }
 async function finishDraw(){
   if(dpPts.length<3)return;
@@ -694,7 +704,7 @@ function nn(pts){
   if(!pts.length)return[];const u=[...pts];const res=[];let cur=u.splice(0,1)[0];res.push(cur.id);
   while(u.length){let bi=0,bd=Infinity;u.forEach((p,i)=>{const d=(p.lat-cur.lat)**2+(p.lng-cur.lng)**2;if(d<bd){bd=d;bi=i;}});cur=u.splice(bi,1)[0];res.push(cur.id);}return res;
 }
-function clrDraw(){dpMkrs.forEach(m=>map.removeLayer(m));dpLines.forEach(l=>map.removeLayer(l));if(prevLine)map.removeLayer(prevLine);dpPts=[];dpMkrs=[];dpLines=[];prevLine=null;isFinishing=false;}
+function clrDraw(){dpMkrs.forEach(m=>map.removeLayer(m));dpLines.forEach(l=>map.removeLayer(l));if(prevLine)map.removeLayer(prevLine);if(proxTooltip){map.removeLayer(proxTooltip);proxTooltip=null;}dpPts=[];dpMkrs=[];dpLines=[];prevLine=null;isFinishing=false;}
 
 // House CRUD
 function onHouseClick(id){
